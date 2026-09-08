@@ -208,11 +208,6 @@
         </button>
     </div>
 
-    <div class="deck__meta">
-        <span class="deck__position" id="posLabel">1 / {{ count($deck) }}</span>
-        <div class="deck__progress"><div class="deck__progress-fill" id="progressFill"></div></div>
-    </div>
-
     <div class="deck__stage">
         <button type="button" class="flashcard" id="card" aria-label="Retourner la carte">
             <span class="flashcard__face">
@@ -234,6 +229,11 @@
     </div>
 
     <p class="visually-hidden" role="status" id="shuffleSay"></p>
+
+    <div class="deck__meta">
+        <span class="deck__position" id="posLabel">1 / {{ count($deck) }}</span>
+        <div class="deck__progress"><div class="deck__progress-fill" id="progressFill"></div></div>
+    </div>
 
     <div class="deck__actions">
         <button type="button" class="btn btn--icon" id="btnPrev" aria-label="Carte précédente">
