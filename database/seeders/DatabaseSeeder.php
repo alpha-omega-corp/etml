@@ -11,6 +11,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(CardSeeder::class);
+        $this->call([BranchSeeder::class, CardSeeder::class]);
     }
 }

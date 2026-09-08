@@ -10,14 +10,16 @@ return new class extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
-            $table->string('section');
+            $table->foreignId('chapter_id')->constrained()->cascadeOnDelete();
+            $table->string('section')->nullable();
             $table->text('de');
             $table->text('fr');
             $table->text('example')->nullable();
-            $table->unsignedInteger('position')->index();
+            $table->unsignedInteger('position');
             $table->timestamps();
 
-            $table->unique('position');
+            // Order is per chapter, so the seeder can upsert on it safely.
+            $table->unique(['chapter_id', 'position']);
         });
     }
 

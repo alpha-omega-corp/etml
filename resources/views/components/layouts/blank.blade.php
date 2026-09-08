@@ -14,7 +14,7 @@
 </head>
 <body class="app-body app-body--centered">
     <main id="main" class="centered-panel">
-        <a href="{{ route('home') }}" class="centered-panel__brand">
+        <a href="{{ url('/') }}" class="centered-panel__brand">
             <x-ui.icon name="layers" size="22" />
             {{ config('app.name') }}
         </a>

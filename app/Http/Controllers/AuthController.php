@@ -22,6 +22,11 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'username' => ['required', 'string', 'min:2', 'max:40', 'regex:/^[\pL\pN _.\-]+$/u'],
+        ], [
+            'username.required' => 'Entrez votre nom.',
+            'username.min' => 'Au moins 2 caractères.',
+            'username.max' => 'Au plus 40 caractères.',
+            'username.regex' => 'Lettres, chiffres, espaces, tirets et points uniquement.',
         ]);
 
         $user = User::firstOrCreate(['username' => trim($data['username'])]);

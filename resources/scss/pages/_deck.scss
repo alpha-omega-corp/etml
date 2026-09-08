@@ -1,0 +1,1086 @@
+// -----------------------------------------------------------------------------
+// Flashcard deck
+//
+// Mobile-first: the deck is a single column that fills the viewport. The four
+// controls — previous, à revoir, je sais, next — sit immediately under the card
+// so the eye never travels between the word and the decision, and the column is
+// kept tight so all of it fits on a phone screen without scrolling.
+// -----------------------------------------------------------------------------
+
+@use '../abstracts' as *;
+
+.deck-body {
+    padding-block-end: space(4);
+}
+
+// Top bar ---------------------------------------------------------------------
+
+.deck-bar {
+    position: sticky;
+    z-index: layer('header');
+    inset-block-start: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: space(2);
+    align-items: center;
+    padding-inline: space(4);
+    padding-block: space(2);
+    background-color: color-mix(in oklab, var(--color-canvas) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-block-end: 1px solid var(--color-border);
+}
+
+// Opens the chapter drawer; the wide layout keeps the rail on screen instead.
+.deck-bar__menu {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: rem(40);
+    height: rem(40);
+    color: var(--color-text);
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-md);
+
+    @include focus-visible;
+
+    &:hover {
+        background-color: var(--color-surface-muted);
+    }
+
+    @include up('lg') {
+        display: none;
+    }
+}
+
+.deck-bar__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+}
+
+.deck-bar__user {
+    display: inline-flex;
+    gap: space(2);
+    align-items: center;
+    max-width: rem(160);
+}
+
+// The header never wraps: its label truncates instead.
+.deck-bar .cluster {
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.deck-bar__name {
+    @include truncate;
+
+    font-size: var(--text-sm);
+    font-weight: 500;
+}
+
+// Shell: branches rail, chapters rail, content -------------------------------
+//
+// On a phone the two navigation levels stack as horizontal strips above the
+// content; from `lg` they become the left rails the layout is built around, and
+// the sub-navigation is separated from the content by a rule.
+
+.deck-shell {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+
+    @include up('lg') {
+        display: grid;
+        grid-template-columns: rem(250) minmax(0, 1fr);
+        width: 100%;
+        max-width: rem(1100);
+        margin-inline: auto;
+    }
+}
+
+// Off-canvas drawer on a phone, static rail from `lg`.
+.subnav {
+    position: fixed;
+    z-index: layer('modal');
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: min(84vw, #{rem(320)});
+    padding-inline: space(4);
+    padding-block: space(3) space(6);
+    overflow-y: auto;
+    background-color: var(--color-surface);
+    border-inline-end: 1px solid var(--color-border);
+    transform: translateX(-100%);
+
+    @include motion-safe {
+        transition: transform $duration-base $ease-out;
+    }
+
+    @include up('lg') {
+        position: sticky;
+        z-index: auto;
+        inset-block: auto;
+        inset-block-start: rem(60);
+        width: auto;
+        align-self: start;
+        padding-inline: space(6) space(4);
+        padding-block: space(6);
+        overflow: visible;
+        background: none;
+        border-inline-end: 0;
+        transform: none;
+    }
+}
+
+body.is-nav-open .subnav {
+    transform: none;
+}
+
+// The drawer's own title row, with the close button.
+.subnav__bar {
+    display: flex;
+    gap: space(2);
+    align-items: center;
+    margin-block-end: space(3);
+
+    @include up('lg') {
+        margin-block-end: space(2);
+    }
+}
+
+.subnav__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: rem(32);
+    height: rem(32);
+    margin-inline-start: auto;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-md);
+
+    @include focus-visible;
+
+    &:hover {
+        color: var(--color-text);
+        background-color: var(--color-surface-muted);
+    }
+
+    @include up('lg') {
+        display: none;
+    }
+}
+
+// Above the header, so nothing behind the drawer stays clickable.
+.nav-backdrop {
+    position: fixed;
+    z-index: layer('overlay');
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    background-color: var(--color-overlay);
+
+    @include motion-safe {
+        transition: opacity $duration-base $ease-out;
+    }
+
+    @include up('lg') {
+        display: none;
+    }
+}
+
+body.is-nav-open .nav-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+// Nothing behind the drawer scrolls while it is open.
+body.is-nav-open {
+    overflow: hidden;
+
+    @include up('lg') {
+        overflow: visible;
+    }
+}
+
+.subnav {
+    @include up('lg') {
+        padding-inline: space(6) space(4);
+    }
+}
+
+.nav-title {
+    margin: 0 0 space(2);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+}
+
+.nav-empty {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-style: italic;
+    color: var(--color-text-subtle);
+}
+
+.nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: space(1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+
+
+// A row is the link plus an edit affordance that only shows on hover, and the
+// input that stands in for the link while renaming.
+.nav-item {
+    display: flex;
+    gap: space(1);
+    align-items: center;
+    min-width: 0;
+}
+
+.nav-item > .nav-link {
+    flex: 1;
+    min-width: 0;
+}
+
+.nav-item__edit {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: rem(28);
+    height: rem(28);
+    color: var(--color-text-subtle);
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-md);
+
+    // Reserved space, so revealing it never nudges the row.
+    visibility: hidden;
+
+    @include focus-visible;
+
+    &:hover {
+        color: var(--color-accent);
+        background-color: var(--color-surface-muted);
+    }
+}
+
+.nav-item__edit--danger:hover {
+    color: var(--color-danger);
+    background-color: var(--color-danger-soft);
+}
+
+.nav-item__delete {
+    display: flex;
+    flex: none;
+}
+
+.nav-item:hover .nav-item__edit,
+.nav-item:focus-within .nav-item__edit {
+    visibility: visible;
+}
+
+// Nothing hovers on a touch screen.
+@media (hover: none) {
+    .nav-item__edit {
+        visibility: visible;
+    }
+}
+
+.nav-item.is-editing > .nav-link,
+.nav-item.is-editing .nav-item__edit,
+.nav-item.is-editing .nav-item__delete {
+    display: none;
+}
+
+.nav-item__input {
+    flex: 1;
+    min-width: 0;
+    height: rem(40);
+    font-size: var(--text-sm);
+}
+
+.nav-item.has-error .nav-item__input,
+.nav-item.has-error > .nav-link {
+    border-color: var(--color-danger);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-danger) 30%, transparent);
+}
+
+.nav-link {
+    display: flex;
+    gap: space(3);
+    align-items: center;
+    min-height: rem(40);
+    padding-block: space(2);
+    padding-inline: space(3);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+
+    @include focus-visible;
+
+    &:hover {
+        color: var(--color-text);
+        background-color: var(--color-surface-muted);
+    }
+}
+
+.nav-link.is-current {
+    font-weight: 600;
+    color: var(--color-accent-contrast);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.nav-link__label {
+    @include truncate;
+}
+
+.nav-link__count {
+    margin-inline-start: auto;
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+}
+
+.subnav__add,
+.subnav__new {
+    display: inline-flex;
+    align-items: center;
+    min-height: rem(36);
+    margin-block-start: space(3);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+
+    @include focus-visible;
+}
+
+.subnav__add > summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: rem(36);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+    cursor: pointer;
+
+    @include focus-visible;
+
+    &::-webkit-details-marker {
+        display: none;
+    }
+}
+
+.subnav__add[open] > summary {
+    margin-block-end: space(3);
+}
+
+// Content column --------------------------------------------------------------
+//
+// The rule separating the sub-navigation from the content sits on the content
+// itself, so it runs the full height of the page rather than stopping where the
+// (sticky, top-aligned) nav happens to end.
+
+.content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    @include up('lg') {
+        border-inline-start: 1px solid var(--color-border);
+    }
+}
+
+.content__crumbs {
+    padding-inline: space(4);
+    padding-block: space(4) 0;
+
+    @include up('lg') {
+        padding-inline: space(6);
+    }
+}
+
+// Empty chapter: the import panel stands in for the deck ----------------------
+
+.import {
+    display: flex;
+    flex-direction: column;
+    gap: space(4);
+    width: 100%;
+    max-width: rem(480);
+    padding-inline: space(4);
+    padding-block: space(6);
+
+    @include up('lg') {
+        max-width: rem(528);
+        padding-inline: space(6);
+    }
+}
+
+.import__title {
+    margin: 0;
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    text-wrap: balance;
+}
+
+// The Claude prompt and the format reference, shown on both editors.
+.json-template {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+
+    > summary {
+        min-height: rem(32);
+        cursor: pointer;
+
+        @include focus-visible;
+    }
+
+    p {
+        margin-block: space(3) space(2);
+        text-wrap: pretty;
+    }
+}
+
+.json-template__body {
+    padding-block-start: space(2);
+}
+
+.json-template__lead {
+    margin-block-start: 0;
+}
+
+.json-template__code {
+    max-height: rem(320);
+    padding: space(3);
+    overflow: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: var(--leading-normal);
+    color: var(--color-text);
+    white-space: pre-wrap;
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.json-template .btn {
+    margin-block-start: space(3);
+}
+
+// Standalone form page (chapter creation) ------------------------------------
+
+.page-form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: space(4);
+    width: 100%;
+    max-width: rem(680);
+    margin-inline: auto;
+    padding-inline: space(4);
+    padding-block: space(6) space(16);
+
+    @include up('md') {
+        padding-inline: space(6);
+    }
+}
+
+.page-form__back {
+    display: inline-flex;
+    gap: space(2);
+    align-items: center;
+    align-self: start;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    @include focus-visible;
+
+    &:hover {
+        color: var(--color-accent);
+    }
+}
+
+.page-form__title {
+    margin: 0;
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    text-wrap: balance;
+}
+
+.page-form__lead {
+    margin: 0;
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+}
+
+.import__format {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+
+    > summary {
+        cursor: pointer;
+
+        @include focus-visible;
+    }
+
+    p {
+        margin-block: space(3) space(2);
+    }
+
+    pre {
+        padding: space(3);
+        overflow-x: auto;
+        font-size: var(--text-xs);
+        background-color: var(--color-surface-muted);
+        border-radius: var(--radius-md);
+    }
+}
+
+.import__lead {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+}
+
+// Deck column -----------------------------------------------------------------
+
+.deck {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: space(3);
+    width: 100%;
+    max-width: rem(480);
+    padding-inline: space(4);
+    padding-block: space(3);
+
+    @include up('lg') {
+        max-width: rem(528);
+        padding-inline: space(6);
+    }
+}
+
+// Filters: one segmented control, counts carried as numbers, not sentences.
+.deck__filters {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+// Touch targets: the segmented control stays comfortably tappable even though
+// it uses the small type step.
+.deck__filters .btn {
+    min-width: 0;
+    min-height: rem(40);
+}
+
+.deck__filter-count {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.btn[aria-pressed='true'] {
+    --btn-bg: var(--color-accent);
+    --btn-fg: var(--color-accent-contrast);
+    --btn-border: var(--color-accent);
+    --btn-bg-hover: var(--color-accent-hover);
+    --btn-fg-hover: var(--color-accent-contrast);
+    --btn-border-hover: var(--color-accent-hover);
+
+    font-weight: 600;
+}
+
+// "À revoir" carries the warning colour so the two decisions never read as the
+// same control at a glance.
+.btn--review {
+    --btn-fg: var(--color-warning);
+    --btn-border: var(--color-warning);
+    --btn-bg-hover: var(--color-warning);
+    --btn-fg-hover: #fff;
+    --btn-border-hover: var(--color-warning);
+}
+
+// Card ------------------------------------------------------------------------
+
+.deck__stage {
+    display: grid;
+    perspective: 1400px;
+}
+
+.flashcard {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: rem(230);
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    transform-style: preserve-3d;
+
+    @include focus-visible(4px);
+    @include motion-safe {
+        transition: transform 500ms cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+
+    @include up('sm') {
+        min-height: rem(260);
+    }
+}
+
+.flashcard.is-flipped {
+    transform: rotateY(180deg);
+}
+
+// Used for a single frame when the deck advances while the card is flipped: the
+// rotation back to the front must not play, or the incoming word is briefly
+// legible on the turning back face.
+.flashcard.is-flip-instant {
+    transition: none;
+}
+
+.flashcard__face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: space(3);
+    align-items: center;
+    justify-content: center;
+    padding: space(6) space(5);
+    text-align: center;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    backface-visibility: hidden;
+}
+
+.flashcard__face--back {
+    transform: rotateY(180deg);
+}
+
+.flashcard__lang {
+    position: absolute;
+    inset-block-start: space(4);
+    inset-inline-start: space(4);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-accent);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+}
+
+.flashcard__mark {
+    position: absolute;
+    inset-block-start: space(3);
+    inset-inline-end: space(3);
+}
+
+.flashcard__word {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    line-height: var(--leading-snug);
+    text-wrap: balance;
+
+    @include up('sm') {
+        font-size: var(--text-3xl);
+    }
+}
+
+.flashcard__face--back .flashcard__word {
+    color: var(--color-accent);
+}
+
+.flashcard__example {
+    max-width: 34ch;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    text-wrap: pretty;
+}
+
+.flashcard__flip {
+    position: absolute;
+    inset-block-end: space(4);
+    color: var(--color-text-muted);
+}
+
+// Meta row: position, progress, direction ------------------------------------
+
+.deck__meta {
+    display: flex;
+    gap: space(3);
+    align-items: center;
+}
+
+.deck__position {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+    white-space: nowrap;
+}
+
+.deck__progress {
+    flex: 1;
+    height: 4px;
+    overflow: hidden;
+    background-color: var(--color-border-strong);
+    border-radius: var(--radius-full);
+}
+
+.deck__progress-fill {
+    width: 0;
+    height: 100%;
+    background-color: var(--color-accent);
+
+    @include motion-safe {
+        transition: width 250ms ease;
+    }
+}
+
+// Action bar ------------------------------------------------------------------
+//
+// Pinned to the bottom on phones, inline on wider screens.
+
+.deck__actions {
+    display: flex;
+    gap: space(2);
+    align-items: center;
+}
+
+// The two decisions are the point of the whole app, so they step outside the
+// template's button vocabulary on purpose: bright opaque fills where every other
+// control is white or pine, a container-sized radius rather than the 8px every
+// other control uses, and a hard 2px shadow that reads as a key to press instead
+// of the system's near-invisible ambient one.
+.deck__actions .btn--decision {
+    --btn-bg: var(--btn-solid);
+    --btn-fg: #fff;
+    --btn-border: var(--btn-solid);
+    --btn-bg-hover: #{'color-mix(in oklab, var(--btn-solid) 88%, #fff)'};
+    --btn-fg-hover: #fff;
+    --btn-border-hover: #{'color-mix(in oklab, var(--btn-solid) 88%, #fff)'};
+    --btn-shadow: 0 2px 0 #{'color-mix(in oklab, var(--btn-solid) 62%, #000)'};
+
+    flex: 1;
+    min-width: 0;
+    min-height: rem(52);
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    border-radius: var(--radius-lg);
+}
+
+// Previous / next are navigation, not decisions: round, quiet, and clearly a
+// different class of control from the pair they flank.
+.deck__actions .btn--icon {
+    --btn-bg: var(--color-surface-muted);
+    --btn-fg: var(--color-text-muted);
+    --btn-border: transparent;
+    --btn-bg-hover: var(--color-surface);
+    --btn-fg-hover: var(--color-text);
+    --btn-border-hover: var(--color-border-strong);
+    --btn-shadow: none;
+
+    flex: none;
+    width: rem(52);
+    min-height: rem(52);
+    border-radius: var(--radius-full);
+}
+
+// Decision buttons ------------------------------------------------------------
+//
+// Marking a word is the one moment in the app worth celebrating, so it gets the
+// full treatment: the button squashes, springs back past its resting size,
+// lights up in a bright opaque fill, and throws a burst of particles outward.
+//
+// Everything that moves is transform/opacity on nodes pooled once at boot, so a
+// tap allocates nothing and the whole effect stays on the compositor. All of the
+// motion is decoration — the colour change alone carries the meaning, which is
+// exactly what a reduced-motion reader is left with.
+
+.deck__actions {
+    // Deliberately brighter and more saturated than the system's status colours:
+    // the ask was for the button to *light up*. One pair per theme, each an
+    // intensification of the status hue it stands in for.
+    // `lit` is the bright hue — particles, ring, halo, flash.
+    --lit-known: #34d399;
+    --lit-review: #fb923c;
+
+    // `solid` is the resting fill. Deeper than `lit` because the label is white
+    // and white on the bright hue lands near 2:1; these clear 4.7:1.
+    --solid-known: #0b8457;
+    --solid-review: #b8510c;
+
+    @include dark {
+        --lit-known: #6ee7b7;
+        --lit-review: #fdba74;
+        --solid-known: #0d9463;
+        --solid-review: #c95c0d;
+    }
+}
+
+.deck__actions .btn--decision {
+    position: relative;
+    overflow: visible;
+    transform-origin: 50% 55%;
+}
+
+.btn--known {
+    --btn-lit: var(--lit-known);
+    --btn-solid: var(--solid-known);
+}
+
+.btn--review {
+    --btn-lit: var(--lit-review);
+    --btn-solid: var(--solid-review);
+}
+
+// `is-active` = the card on screen is already in this list, so the pair reads
+// like a like button. `is-lit` = the transient flash right after a press.
+.btn--decision.is-active,
+.btn--decision.is-lit {
+    --btn-bg: #{'color-mix(in oklab, var(--btn-solid) 78%, #000)'};
+    --btn-fg: #fff;
+    --btn-border: var(--btn-lit);
+    --btn-bg-hover: #{'color-mix(in oklab, var(--btn-solid) 78%, #000)'};
+    --btn-fg-hover: #fff;
+    --btn-border-hover: var(--btn-lit);
+    --btn-shadow: 0 0 0 4px #{'color-mix(in oklab, var(--btn-lit) 55%, transparent)'};
+}
+
+// A white wash over the fill for the first frames of the press: the "lights up"
+// beat, done with opacity so it stays off the paint path.
+.btn__flash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-color: #fff;
+    border-radius: inherit;
+    opacity: 0;
+}
+
+// Zero-sized anchor at the centre of the button. Particles are absolutely
+// positioned against it and are free to travel outside the button box.
+.burst {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+// Centring uses the standalone `translate` property so `transform` stays free
+// for the animation to own outright.
+.burst__bit,
+.burst__ring {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    translate: -50% -50%;
+    opacity: 0;
+}
+
+.burst__bit {
+    width: rem(10);
+    height: rem(10);
+    background-color: var(--btn-lit);
+    border-radius: var(--radius-full);
+}
+
+.burst__bit--bar {
+    width: rem(4);
+    height: rem(16);
+    border-radius: var(--radius-sm);
+}
+
+// A lighter tint mixed into the burst so it sparkles instead of reading as one
+// flat blob of colour.
+.burst__bit--spark {
+    background-color: color-mix(in oklab, var(--btn-lit) 42%, #fff);
+}
+
+// Drawn as a gradient rather than a border: the system allows no border heavier
+// than 1px, and a 1px ring disappears at this speed.
+.burst__ring {
+    width: rem(104);
+    height: rem(104);
+    background-image: radial-gradient(
+        circle,
+        transparent 56%,
+        var(--btn-lit) 58%,
+        var(--btn-lit) 62%,
+        transparent 65%
+    );
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .burst,
+    .btn__flash {
+        display: none;
+    }
+}
+
+// Settings, not the thing you came here to do: quiet type, no fills, no borders.
+// Sits above the lists so it reads as configuration for everything below it.
+.deck__toolbar {
+    display: flex;
+    gap: space(2);
+    align-items: center;
+    justify-content: space-between;
+}
+
+.deck__toolbar .btn {
+    --btn-bg: transparent;
+    --btn-fg: var(--color-text-subtle);
+    --btn-border: transparent;
+    --btn-bg-hover: var(--color-surface-muted);
+    --btn-fg-hover: var(--color-text);
+    --btn-border-hover: transparent;
+    --btn-shadow: none;
+
+    min-width: 0;
+    min-height: rem(30);
+    padding-inline: space(2);
+    font-size: var(--text-xs);
+    font-weight: 500;
+}
+
+.deck__toolbar .btn[aria-pressed='true'] {
+    --btn-bg: var(--color-surface-muted);
+    --btn-fg: var(--color-text);
+    --btn-border: transparent;
+    --btn-bg-hover: var(--color-surface-muted);
+    --btn-fg-hover: var(--color-text);
+    --btn-border-hover: transparent;
+
+    font-weight: 600;
+}
+
+// Vocabulary --------------------------------------------------------------------
+
+// Full-width entry to the list, at the top of the column.
+.vocab-open {
+    display: flex;
+    gap: space(2);
+    align-items: center;
+    width: 100%;
+    min-height: rem(44);
+    padding-inline: space(4);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+
+    @include focus-visible;
+
+    &:hover {
+        border-color: var(--color-accent);
+    }
+
+    svg {
+        flex: none;
+        color: var(--color-text-subtle);
+    }
+}
+
+.vocab-open__label {
+    @include truncate;
+}
+
+.vocab-open__count {
+    margin-inline-start: auto;
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+}
+
+// The list fills the screen: there is nothing else to look at while it is open.
+.modal--full {
+    inset: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+}
+
+// Stays put while the list scrolls under it.
+.vocab__search {
+    position: sticky;
+    z-index: layer('raised');
+    inset-block-start: calc(#{space(6)} * -1);
+    display: flex;
+    gap: space(3);
+    align-items: center;
+    margin-block: calc(#{space(6)} * -1) space(4);
+    padding-block: space(6) space(3);
+    background-color: var(--color-surface-raised);
+}
+
+.vocab__search .input {
+    flex: 1;
+    min-width: 0;
+}
+
+.vocab__count {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+.vocab__empty {
+    padding-block: space(6);
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+// Only takes up room when it has something to say.
+.deck__sync {
+    font-size: var(--text-xs);
+    color: var(--color-danger);
+    text-align: center;
+
+    &:empty {
+        display: none;
+    }
+}

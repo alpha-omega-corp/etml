@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Card;
 use App\Models\CardState;
 use App\Models\User;
-use Database\Seeders\CardSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,7 +15,7 @@ class CardsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(CardSeeder::class);
+        $this->seed();
     }
 
     private function firstCard(): Card
@@ -39,6 +38,20 @@ class CardsTest extends TestCase
 
         $this->assertSame(40, Card::whereNotNull('example')->count());
         $this->assertSame(6, Card::distinct()->count('section'));
+    }
+
+    public function test_the_vocabulary_list_opens_a_full_screen_modal_with_a_search(): void
+    {
+        $this->post('/login', ['username' => 'anna']);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('data-modal-open="vocab"', false)
+            ->assertSee('Tout le vocabulaire')
+            ->assertSee('id="vocab"', false)
+            ->assertSee('modal--full', false)
+            ->assertSee('id="vocabSearch"', false)
+            ->assertSee('data-modal-close', false);
     }
 
     public function test_it_sends_guests_to_the_login_page(): void
