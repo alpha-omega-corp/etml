@@ -10,7 +10,12 @@
 @use '../abstracts' as *;
 
 .deck-body {
-    padding-block-end: space(4);
+    // Room for the pinned bar, which is two rows tall.
+    padding-block-end: rem(160);
+
+    @include up('lg') {
+        padding-block-end: space(4);
+    }
 }
 
 // Top bar ---------------------------------------------------------------------
@@ -908,93 +913,60 @@ body.is-nav-open {
 //
 // Pinned to the bottom on phones, inline on wider screens.
 
-// On a phone the four controls stack into two full-width rows of two:
-// navigation first, the two decisions below it where the thumb lands. The
-// single inline row returns at `lg`, alongside the sidebar rail.
+// On a phone the two decisions are pinned to the bottom of the screen, where the
+// thumb already is, and previous/next sit as a round pair under the card. From
+// `lg` the four go back to one inline row.
+// On a phone every control lives in one bar pinned to the bottom of the screen:
+// the two decisions across the top of it, the round arrows centred beneath.
+// From `lg` it is a single inline row in the flow again.
 .deck__actions {
+    position: fixed;
+    z-index: layer('sticky');
+    inset-block-end: 0;
+    inset-inline: 0;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: space(2);
     align-items: center;
-    width: 100%;
+    padding-inline: space(4);
+    padding-block: space(3);
+    padding-block-end: calc(#{space(3)} + env(safe-area-inset-bottom));
+    background-color: color-mix(in oklab, var(--color-canvas) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-block-start: 1px solid var(--color-border);
 
     @include up('lg') {
+        position: static;
+        z-index: auto;
         display: flex;
+        gap: space(2);
+        justify-content: flex-start;
+        padding: 0;
+        background: none;
+        backdrop-filter: none;
+        border: 0;
     }
 }
 
-// Placed rather than reordered, so the DOM keeps its reading order: previous,
-// à revoir, je sais, next.
+// The decisions span the bar; the arrows meet in the middle of the row below.
 .deck__actions > .btn:first-child {
-    grid-area: 1 / 1;
+    grid-area: 2 / 1;
+    justify-self: end;
 }
 
 .deck__actions > .btn:last-child {
-    grid-area: 1 / 2;
-}
-
-.deck__actions .btn--review {
-    grid-area: 2 / 1;
-}
-
-.deck__actions .btn--known {
     grid-area: 2 / 2;
+    justify-self: start;
 }
 
-// The two decisions are the point of the whole app, so they step outside the
-// template's button vocabulary on purpose: bright opaque fills where every other
-// control is white or pine, a container-sized radius rather than the 8px every
-// other control uses, and a hard 2px shadow that reads as a key to press instead
-// of the system's near-invisible ambient one.
-.deck__actions .btn--decision {
-    width: 100%;
-    --btn-bg: var(--btn-lit);
-    --btn-fg: #{'color-mix(in oklab, var(--btn-solid) 34%, #000)'};
-    --btn-border: var(--btn-lit);
-    --btn-bg-hover: #{'color-mix(in oklab, var(--btn-lit) 88%, #fff)'};
-    --btn-fg-hover: #{'color-mix(in oklab, var(--btn-solid) 34%, #000)'};
-    --btn-border-hover: #{'color-mix(in oklab, var(--btn-lit) 88%, #fff)'};
-    --btn-shadow: 0 2px 0 var(--btn-solid);
-
-    flex: 1;
-    min-width: 0;
-    min-height: rem(52);
-    font-size: var(--text-base);
-    font-weight: 600;
-    letter-spacing: var(--tracking-tight);
-    border-radius: var(--radius-lg);
-}
-
-// Previous / next are navigation, not decisions: round, quiet, and clearly a
-// different class of control from the pair they flank.
-.deck__actions .btn--icon {
-    --btn-bg: var(--color-surface);
-    --btn-fg: var(--color-text);
-    --btn-border: var(--color-border-strong);
-    --btn-bg-hover: var(--color-accent-soft);
-    --btn-fg-hover: var(--color-accent);
-    --btn-border-hover: var(--color-accent);
-    --btn-shadow: var(--shadow-xs);
-
-    flex: none;
-
-    // Fills its half of the row on a phone, so the component's square aspect
-    // has to go; back to a round button once the row is inline again.
-    width: 100%;
-    height: rem(52);
-    min-height: rem(52);
-    aspect-ratio: auto;
-    border-radius: var(--radius-full);
+.deck__decide {
+    grid-area: 1 / 1 / 2 / -1;
+    display: flex;
+    gap: space(2);
 
     @include up('lg') {
-        width: rem(52);
-        aspect-ratio: 1;
-    }
-
-    svg {
-        width: 1.5em;
-        height: 1.5em;
-        stroke-width: 2;
+        grid-area: auto;
+        flex: 1;
     }
 }
 
@@ -1046,9 +1018,57 @@ body.is-nav-open {
     --btn-solid: var(--solid-review);
 }
 
-// `is-active` = the card on screen is already in this list, so the pair reads
-// like a like button. `is-lit` = the transient flash right after a press.
-.btn--decision.is-active,
+// The two decisions step outside the template's button vocabulary on purpose:
+// bright opaque fills where every other control is white or pine, a
+// container-sized radius rather than the 8px everything else uses, and a hard
+// 2px shadow that reads as a key to press.
+.deck__actions .btn--decision {
+    --btn-bg: var(--btn-lit);
+    --btn-fg: #{'color-mix(in oklab, var(--btn-solid) 34%, #000)'};
+    --btn-border: var(--btn-lit);
+    --btn-bg-hover: #{'color-mix(in oklab, var(--btn-lit) 88%, #fff)'};
+    --btn-fg-hover: #{'color-mix(in oklab, var(--btn-solid) 34%, #000)'};
+    --btn-border-hover: #{'color-mix(in oklab, var(--btn-lit) 88%, #fff)'};
+    --btn-shadow: 0 2px 0 var(--btn-solid);
+
+    flex: 1;
+    min-width: 0;
+    min-height: rem(52);
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    border-radius: var(--radius-lg);
+}
+
+// Previous / next are navigation, not decisions: a round pair, visibly a
+// different class of control from the two they sit above.
+.deck__actions .btn--icon {
+    --btn-bg: var(--color-surface);
+    --btn-fg: var(--color-text);
+    --btn-border: var(--color-border-strong);
+    --btn-bg-hover: var(--color-accent-soft);
+    --btn-fg-hover: var(--color-accent);
+    --btn-border-hover: var(--color-accent);
+    --btn-shadow: var(--shadow-xs);
+
+    flex: none;
+    width: rem(52);
+    height: rem(52);
+    min-height: rem(52);
+    padding: 0;
+    aspect-ratio: 1;
+    border-radius: var(--radius-full);
+
+    svg {
+        width: 1.5em;
+        height: 1.5em;
+        stroke-width: 2;
+    }
+}
+
+// `is-lit` is the transient flash right after a press — the feedback for the
+// tap itself, and the only feedback a reduced-motion reader gets. The button
+// never carries the card's saved state; the badge on the card says that.
 .btn--decision.is-lit {
     --btn-bg: var(--btn-solid);
     --btn-fg: #fff;

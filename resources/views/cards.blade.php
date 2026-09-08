@@ -240,19 +240,21 @@
             <x-ui.icon name="chevron-left" />
         </button>
 
-        <button type="button" class="btn btn--decision btn--review" id="btnReview">
-            <x-ui.icon name="clock" />
-            <span class="btn__label">À revoir</span>
-            <span class="btn__flash" aria-hidden="true"></span>
-            <span class="burst" aria-hidden="true"></span>
-        </button>
+        <div class="deck__decide">
+            <button type="button" class="btn btn--decision btn--review" id="btnReview">
+                <x-ui.icon name="clock" />
+                <span class="btn__label">À revoir</span>
+                <span class="btn__flash" aria-hidden="true"></span>
+                <span class="burst" aria-hidden="true"></span>
+            </button>
 
-        <button type="button" class="btn btn--decision btn--known" id="btnKnown">
-            <x-ui.icon name="check" />
-            <span class="btn__label">Je sais</span>
-            <span class="btn__flash" aria-hidden="true"></span>
-            <span class="burst" aria-hidden="true"></span>
-        </button>
+            <button type="button" class="btn btn--decision btn--known" id="btnKnown">
+                <x-ui.icon name="check" />
+                <span class="btn__label">Je sais</span>
+                <span class="btn__flash" aria-hidden="true"></span>
+                <span class="burst" aria-hidden="true"></span>
+            </button>
+        </div>
 
         <button type="button" class="btn btn--icon" id="btnNext" aria-label="Carte suivante">
             <x-ui.icon name="chevron-right" />
@@ -627,7 +629,6 @@ function render() {
         example.textContent = '';
         posLabel.textContent = '0 / 0';
         progressFill.style.width = '0%';
-        syncDecisionState(null);
         return;
     }
 
@@ -648,7 +649,6 @@ function render() {
 
     example.textContent = item.ex || '';
     renderMark(index);
-    syncDecisionState(index);
     posLabel.textContent = (pos + 1) + ' / ' + order.length;
     progressFill.style.width = (pos / (order.length - 1 || 1) * 100) + '%';
 }
@@ -786,12 +786,6 @@ Object.entries(decisionButtons).forEach(([kind, button]) => {
 
     bursts[kind] = { bits, flash: button.querySelector('.btn__flash'), glyph: button.querySelector('svg') };
 });
-
-// Les boutons portent l'état de la carte affichée, comme un bouton « j'aime ».
-function syncDecisionState(index) {
-    decisionButtons.known.classList.toggle('is-active', index !== null && knownSet.has(index));
-    decisionButtons.review.classList.toggle('is-active', index !== null && reviewSet.has(index));
-}
 
 function celebrate(kind) {
     const button = decisionButtons[kind];
