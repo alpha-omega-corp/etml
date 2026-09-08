@@ -908,10 +908,37 @@ body.is-nav-open {
 //
 // Pinned to the bottom on phones, inline on wider screens.
 
+// On a phone the four controls stack into two full-width rows of two:
+// navigation first, the two decisions below it where the thumb lands. The
+// single inline row returns at `lg`, alongside the sidebar rail.
 .deck__actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: space(2);
     align-items: center;
+    width: 100%;
+
+    @include up('lg') {
+        display: flex;
+    }
+}
+
+// Placed rather than reordered, so the DOM keeps its reading order: previous,
+// à revoir, je sais, next.
+.deck__actions > .btn:first-child {
+    grid-area: 1 / 1;
+}
+
+.deck__actions > .btn:last-child {
+    grid-area: 1 / 2;
+}
+
+.deck__actions .btn--review {
+    grid-area: 2 / 1;
+}
+
+.deck__actions .btn--known {
+    grid-area: 2 / 2;
 }
 
 // The two decisions are the point of the whole app, so they step outside the
@@ -920,6 +947,7 @@ body.is-nav-open {
 // other control uses, and a hard 2px shadow that reads as a key to press instead
 // of the system's near-invisible ambient one.
 .deck__actions .btn--decision {
+    width: 100%;
     --btn-bg: var(--btn-lit);
     --btn-fg: #{'color-mix(in oklab, var(--btn-solid) 34%, #000)'};
     --btn-border: var(--btn-lit);
@@ -949,9 +977,19 @@ body.is-nav-open {
     --btn-shadow: var(--shadow-xs);
 
     flex: none;
-    width: rem(52);
+
+    // Fills its half of the row on a phone, so the component's square aspect
+    // has to go; back to a round button once the row is inline again.
+    width: 100%;
+    height: rem(52);
     min-height: rem(52);
+    aspect-ratio: auto;
     border-radius: var(--radius-full);
+
+    @include up('lg') {
+        width: rem(52);
+        aspect-ratio: 1;
+    }
 
     svg {
         width: 1.5em;
