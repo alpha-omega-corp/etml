@@ -54,6 +54,19 @@ class CardsTest extends TestCase
             ->assertSee('data-modal-close', false);
     }
 
+    public function test_shuffling_has_a_visible_celebration(): void
+    {
+        $this->post('/login', ['username' => 'anna']);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('id="shuffleFx"', false)
+            ->assertSee('shuffle-fx__icon', false)
+            // Announced for anyone who cannot see the confetti.
+            ->assertSee('id="shuffleSay"', false)
+            ->assertSee('role="status"', false);
+    }
+
     public function test_it_sends_guests_to_the_login_page(): void
     {
         $this->get('/')->assertRedirect('/login');

@@ -55,10 +55,28 @@
     }
 }
 
-.deck-bar__title {
-    font-size: var(--text-base);
+// Titles get the rounded display face: the one place the app allows itself a
+// second typeface, because the name and the page headings should read as play
+// rather than as chrome.
+.deck-bar__title,
+.page-form__title,
+.import__title,
+.modal__title,
+.centered-panel__brand {
+    font-family: var(--font-display);
     font-weight: 600;
-    letter-spacing: var(--tracking-tight);
+    letter-spacing: 0.01em;
+}
+
+.deck-bar__title {
+    font-size: var(--text-xl);
+    color: var(--color-accent);
+}
+
+@include up('lg') {
+    .deck-bar__title {
+        font-size: var(--text-2xl);
+    }
 }
 
 .deck-bar__user {
@@ -421,6 +439,74 @@ body.is-nav-open {
     }
 }
 
+// Chapter title, with the reading direction opposite it -----------------------
+
+.deck-head {
+    display: flex;
+    gap: space(3);
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: rem(528);
+    padding-inline: space(4);
+    padding-block: space(4) 0;
+
+    @include up('lg') {
+        padding-inline: space(6);
+    }
+}
+
+.deck-head__title {
+    @include truncate;
+
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+// A single pill split in two: the chosen direction is the coloured half.
+.dir-pill {
+    display: flex;
+    flex: none;
+    padding: rem(3);
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+}
+
+.dir-pill__option {
+    padding-inline: space(3);
+    padding-block: rem(5);
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-full);
+
+    @include focus-visible;
+
+    @include motion-safe {
+        transition:
+            background-color $duration-fast $ease-out,
+            color $duration-fast $ease-out;
+    }
+
+    &:hover {
+        color: var(--color-text);
+    }
+}
+
+.dir-pill__option[aria-pressed='true'] {
+    color: var(--color-accent-contrast);
+    background-color: var(--color-accent);
+}
+
 // Empty chapter: the import panel stands in for the deck ----------------------
 
 .import {
@@ -440,9 +526,7 @@ body.is-nav-open {
 
 .import__title {
     margin: 0;
-    font-size: var(--text-xl);
-    font-weight: 600;
-    letter-spacing: var(--tracking-tight);
+    font-size: var(--text-2xl);
     text-wrap: balance;
 }
 
@@ -527,9 +611,7 @@ body.is-nav-open {
 
 .page-form__title {
     margin: 0;
-    font-size: var(--text-2xl);
-    font-weight: 600;
-    letter-spacing: var(--tracking-tight);
+    font-size: var(--text-3xl);
     text-wrap: balance;
 }
 
@@ -629,8 +711,63 @@ body.is-nav-open {
 // Card ------------------------------------------------------------------------
 
 .deck__stage {
+    position: relative;
     display: grid;
     perspective: 1400px;
+}
+
+// Card and the shuffle overlay share the single cell.
+.deck__stage > * {
+    grid-area: 1 / 1;
+}
+
+// Shown when the deck is shuffled: the card shakes and this throws confetti.
+.shuffle-fx {
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+}
+
+.shuffle-fx__icon {
+    width: rem(60);
+    height: rem(60);
+    color: var(--color-accent);
+
+    // Sits above the word rather than on it. Uses the standalone property so
+    // the animation keeps `transform` to itself.
+    translate: 0 rem(-46);
+    opacity: 0;
+}
+
+.shuffle-fx__bit {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    width: rem(9);
+    height: rem(9);
+    translate: -50% -50%;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+}
+
+// Three colours, so it reads as confetti rather than as one more status burst.
+.shuffle-fx__bit--0 {
+    background-color: var(--color-accent);
+}
+
+.shuffle-fx__bit--1 {
+    background-color: var(--lit-known, #34d399);
+    border-radius: var(--radius-full);
+}
+
+.shuffle-fx__bit--2 {
+    background-color: var(--lit-review, #fb923c);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shuffle-fx__bit {
+        display: none;
+    }
 }
 
 .flashcard {
@@ -678,6 +815,7 @@ body.is-nav-open {
     justify-content: center;
     padding: space(6) space(5);
     text-align: center;
+    color: var(--color-text);
     background-color: var(--color-surface);
     border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-lg);
@@ -695,7 +833,7 @@ body.is-nav-open {
     inset-inline-start: space(4);
     font-size: var(--text-xs);
     font-weight: 600;
-    color: var(--color-accent);
+    color: var(--color-text-muted);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
 }
@@ -717,21 +855,19 @@ body.is-nav-open {
     }
 }
 
-.flashcard__face--back .flashcard__word {
-    color: var(--color-accent);
-}
+
 
 .flashcard__example {
     max-width: 34ch;
     font-size: var(--text-sm);
-    color: var(--color-text);
+    color: var(--color-text-muted);
     text-wrap: pretty;
 }
 
 .flashcard__flip {
     position: absolute;
     inset-block-end: space(4);
-    color: var(--color-text-muted);
+    color: var(--color-text-subtle);
 }
 
 // Meta row: position, progress, direction ------------------------------------
@@ -784,13 +920,13 @@ body.is-nav-open {
 // other control uses, and a hard 2px shadow that reads as a key to press instead
 // of the system's near-invisible ambient one.
 .deck__actions .btn--decision {
-    --btn-bg: var(--btn-solid);
-    --btn-fg: #fff;
-    --btn-border: var(--btn-solid);
-    --btn-bg-hover: #{'color-mix(in oklab, var(--btn-solid) 88%, #fff)'};
-    --btn-fg-hover: #fff;
-    --btn-border-hover: #{'color-mix(in oklab, var(--btn-solid) 88%, #fff)'};
-    --btn-shadow: 0 2px 0 #{'color-mix(in oklab, var(--btn-solid) 62%, #000)'};
+    --btn-bg: var(--btn-lit);
+    --btn-fg: #{'color-mix(in oklab, var(--btn-solid) 34%, #000)'};
+    --btn-border: var(--btn-lit);
+    --btn-bg-hover: #{'color-mix(in oklab, var(--btn-lit) 88%, #fff)'};
+    --btn-fg-hover: #{'color-mix(in oklab, var(--btn-solid) 34%, #000)'};
+    --btn-border-hover: #{'color-mix(in oklab, var(--btn-lit) 88%, #fff)'};
+    --btn-shadow: 0 2px 0 var(--btn-solid);
 
     flex: 1;
     min-width: 0;
@@ -804,18 +940,24 @@ body.is-nav-open {
 // Previous / next are navigation, not decisions: round, quiet, and clearly a
 // different class of control from the pair they flank.
 .deck__actions .btn--icon {
-    --btn-bg: var(--color-surface-muted);
-    --btn-fg: var(--color-text-muted);
-    --btn-border: transparent;
-    --btn-bg-hover: var(--color-surface);
-    --btn-fg-hover: var(--color-text);
-    --btn-border-hover: var(--color-border-strong);
-    --btn-shadow: none;
+    --btn-bg: var(--color-surface);
+    --btn-fg: var(--color-text);
+    --btn-border: var(--color-border-strong);
+    --btn-bg-hover: var(--color-accent-soft);
+    --btn-fg-hover: var(--color-accent);
+    --btn-border-hover: var(--color-accent);
+    --btn-shadow: var(--shadow-xs);
 
     flex: none;
     width: rem(52);
     min-height: rem(52);
     border-radius: var(--radius-full);
+
+    svg {
+        width: 1.5em;
+        height: 1.5em;
+        stroke-width: 2;
+    }
 }
 
 // Decision buttons ------------------------------------------------------------
@@ -870,13 +1012,13 @@ body.is-nav-open {
 // like a like button. `is-lit` = the transient flash right after a press.
 .btn--decision.is-active,
 .btn--decision.is-lit {
-    --btn-bg: #{'color-mix(in oklab, var(--btn-solid) 78%, #000)'};
+    --btn-bg: var(--btn-solid);
     --btn-fg: #fff;
-    --btn-border: var(--btn-lit);
-    --btn-bg-hover: #{'color-mix(in oklab, var(--btn-solid) 78%, #000)'};
+    --btn-border: var(--btn-solid);
+    --btn-bg-hover: var(--btn-solid);
     --btn-fg-hover: #fff;
-    --btn-border-hover: var(--btn-lit);
-    --btn-shadow: 0 0 0 4px #{'color-mix(in oklab, var(--btn-lit) 55%, transparent)'};
+    --btn-border-hover: var(--btn-solid);
+    --btn-shadow: 0 0 0 4px #{'color-mix(in oklab, var(--btn-lit) 65%, transparent)'};
 }
 
 // A white wash over the fill for the first frames of the press: the "lights up"
@@ -903,20 +1045,16 @@ body.is-nav-open {
 
 // Centring uses the standalone `translate` property so `transform` stays free
 // for the animation to own outright.
-.burst__bit,
-.burst__ring {
+.burst__bit {
     position: absolute;
     inset-block-start: 0;
     inset-inline-start: 0;
     translate: -50% -50%;
-    opacity: 0;
-}
-
-.burst__bit {
     width: rem(10);
     height: rem(10);
     background-color: var(--btn-lit);
     border-radius: var(--radius-full);
+    opacity: 0;
 }
 
 .burst__bit--bar {
@@ -931,20 +1069,6 @@ body.is-nav-open {
     background-color: color-mix(in oklab, var(--btn-lit) 42%, #fff);
 }
 
-// Drawn as a gradient rather than a border: the system allows no border heavier
-// than 1px, and a 1px ring disappears at this speed.
-.burst__ring {
-    width: rem(104);
-    height: rem(104);
-    background-image: radial-gradient(
-        circle,
-        transparent 56%,
-        var(--btn-lit) 58%,
-        var(--btn-lit) 62%,
-        transparent 65%
-    );
-}
-
 @media (prefers-reduced-motion: reduce) {
     .burst,
     .btn__flash {
@@ -952,50 +1076,21 @@ body.is-nav-open {
     }
 }
 
-// Settings, not the thing you came here to do: quiet type, no fills, no borders.
-// Sits above the lists so it reads as configuration for everything below it.
-.deck__toolbar {
+// The vocabulary opener and the shuffle share one row and one height.
+.deck__tools {
     display: flex;
     gap: space(2);
-    align-items: center;
-    justify-content: space-between;
+    align-items: stretch;
 }
-
-.deck__toolbar .btn {
-    --btn-bg: transparent;
-    --btn-fg: var(--color-text-subtle);
-    --btn-border: transparent;
-    --btn-bg-hover: var(--color-surface-muted);
-    --btn-fg-hover: var(--color-text);
-    --btn-border-hover: transparent;
-    --btn-shadow: none;
-
-    min-width: 0;
-    min-height: rem(30);
-    padding-inline: space(2);
-    font-size: var(--text-xs);
-    font-weight: 500;
-}
-
-.deck__toolbar .btn[aria-pressed='true'] {
-    --btn-bg: var(--color-surface-muted);
-    --btn-fg: var(--color-text);
-    --btn-border: transparent;
-    --btn-bg-hover: var(--color-surface-muted);
-    --btn-fg-hover: var(--color-text);
-    --btn-border-hover: transparent;
-
-    font-weight: 600;
-}
-
 // Vocabulary --------------------------------------------------------------------
 
 // Full-width entry to the list, at the top of the column.
 .vocab-open {
     display: flex;
+    flex: 1;
     gap: space(2);
     align-items: center;
-    width: 100%;
+    min-width: 0;
     min-height: rem(44);
     padding-inline: space(4);
     font: inherit;

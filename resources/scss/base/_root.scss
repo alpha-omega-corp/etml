@@ -89,6 +89,7 @@ $accent-default: 'green' !default;
 
     // Typography ------------------------------------------------------------
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+    --font-display: 'Fredoka', 'Instrument Sans', ui-rounded, ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, sfmono-regular, 'SF Mono', menlo, consolas, monospace;
 
     --text-xs: #{rem(12)};

@@ -122,14 +122,17 @@
 
 <main id="main" class="content">
 
-    @php
-        $crumbs = array_values(array_filter([
-            $chapter ? ['label' => $chapter->name] : null,
-        ]));
-    @endphp
+    @if ($chapter)
+        <div class="deck-head">
+            <h1 class="deck-head__title">{{ $chapter->name }}</h1>
 
-    @if ($crumbs !== [])
-        <x-ui.breadcrumbs :items="$crumbs" class="content__crumbs" />
+            @if (count($deck) > 0)
+                <div class="dir-pill" role="group" aria-label="Sens de traduction">
+                    <button type="button" class="dir-pill__option" id="dirFrDe" aria-pressed="true">FR → DE</button>
+                    <button type="button" class="dir-pill__option" id="dirDeFr" aria-pressed="false">DE → FR</button>
+                </div>
+            @endif
+        </div>
     @endif
 
 @if (! $chapter)
@@ -185,19 +188,14 @@
 
     <div class="deck">
 
-    <button type="button" class="vocab-open" data-modal-open="vocab">
-        <x-ui.icon name="book" size="16" />
-        <span class="vocab-open__label">Tout le vocabulaire</span>
-        <span class="vocab-open__count">{{ count($deck) }}</span>
-    </button>
+    <div class="deck__tools">
+        <button type="button" class="vocab-open" data-modal-open="vocab">
+            <x-ui.icon name="book" size="16" />
+            <span class="vocab-open__label">Tout le vocabulaire</span>
+            <span class="vocab-open__count">{{ count($deck) }}</span>
+        </button>
 
-    <div class="deck__toolbar">
-        <div class="btn-group" role="group" aria-label="Sens de traduction">
-            <button type="button" class="btn btn--sm" id="dirFrDe" aria-pressed="true">FR → DE</button>
-            <button type="button" class="btn btn--sm" id="dirDeFr" aria-pressed="false">DE → FR</button>
-        </div>
-
-        <x-ui.button type="button" variant="ghost" size="sm" icon="layers" id="btnShuffle">Mélanger</x-ui.button>
+        <x-ui.button type="button" size="sm" icon="shuffle" id="btnShuffle" class="deck__shuffle">Mélanger</x-ui.button>
     </div>
 
     <div class="deck__filters btn-group" role="group" aria-label="Filtrer les cartes">
@@ -229,7 +227,13 @@
                 <span class="flashcard__example" id="example"></span>
             </span>
         </button>
+
+        <span class="shuffle-fx" id="shuffleFx" aria-hidden="true">
+            <x-ui.icon name="sparkles" class="shuffle-fx__icon" />
+        </span>
     </div>
+
+    <p class="visually-hidden" role="status" id="shuffleSay"></p>
 
     <div class="deck__actions">
         <button type="button" class="btn btn--icon" id="btnPrev" aria-label="Carte précédente">
@@ -410,11 +414,11 @@ function applyRename(item, name) {
     item.querySelector('[data-chapter-input]').value = name;
     item.querySelector('[data-chapter-edit]').setAttribute('aria-label', 'Renommer « ' + name + ' »');
 
-    // The breadcrumb names the chapter on screen, so it follows along.
+    // The page title names the chapter on screen, so it follows along.
     if (item.querySelector('.nav-link').classList.contains('is-current')) {
-        const crumb = document.querySelector('.breadcrumbs__current');
-        if (crumb) {
-            crumb.textContent = name;
+        const title = document.querySelector('.deck-head__title');
+        if (title) {
+            title.textContent = name;
         }
     }
 }
@@ -651,6 +655,9 @@ function render() {
 
 function flip() {
     if (order.length === 0) return;
+
+    fxAnims.forEach((anim) => anim.cancel());
+    fxAnims.length = 0;
     flipped = !flipped;
     cardEl.classList.toggle('is-flipped', flipped);
 }
@@ -668,13 +675,88 @@ function prev() {
 el('btnNext').onclick = next;
 el('btnPrev').onclick = prev;
 
+// --- mélange : la carte se secoue et lâche des confettis ---------------------
+
+const FX_BITS = 18;
+const fx = el('shuffleFx');
+const fxIcon = fx.querySelector('.icon');
+const fxBits = [];
+const fxAnims = [];
+
+for (let i = 0; i < FX_BITS; i++) {
+    const bit = document.createElement('span');
+    bit.className = 'shuffle-fx__bit shuffle-fx__bit--' + (i % 3);
+    fx.append(bit);
+    fxBits.push(bit);
+}
+
+function celebrateShuffle() {
+    el('shuffleSay').textContent = order.length + ' cartes mélangées.';
+
+    fxAnims.forEach((anim) => anim.cancel());
+    fxAnims.length = 0;
+
+    const keep = (anim) => { fxAnims.push(anim); return anim; };
+
+    if (reduceMotion.matches) {
+        // Pas de mouvement : l'icône paraît puis s'efface, c'est tout.
+        keep(fxIcon.animate([{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 900 }));
+
+        return;
+    }
+
+    keep(cardEl.animate([
+        { transform: 'translateX(0) rotate(0deg)' },
+        { transform: 'translateX(-11px) rotate(-3.6deg)', offset: 0.12 },
+        { transform: 'translateX(10px) rotate(3.1deg)', offset: 0.28 },
+        { transform: 'translateX(-8px) rotate(-2.3deg)', offset: 0.44 },
+        { transform: 'translateX(6px) rotate(1.7deg)', offset: 0.6 },
+        { transform: 'translateX(-3px) rotate(-0.9deg)', offset: 0.78 },
+        { transform: 'translateX(0) rotate(0deg)' },
+    ], { duration: 660, easing: 'cubic-bezier(.32,.7,.35,1)' }));
+
+    keep(fxIcon.animate([
+        { transform: 'scale(0.3) rotate(-28deg)', opacity: 0 },
+        { transform: 'scale(1.3) rotate(10deg)', opacity: 1, offset: 0.24 },
+        { transform: 'scale(1) rotate(0deg)', opacity: 1, offset: 0.58 },
+        { transform: 'scale(0.86) rotate(4deg)', opacity: 0 },
+    ], { duration: 820, easing: 'cubic-bezier(.22,.9,.3,1)' }));
+
+    fxBits.forEach((bit, i) => {
+        const angle = (i / FX_BITS) * Math.PI * 2 + (Math.random() - 0.5) * 0.9;
+        const distance = 40 + Math.pow(Math.random(), 1.6) * 110;
+        const spin = (Math.random() - 0.5) * 640;
+
+        keep(bit.animate([
+            { transform: 'translate3d(0, 0, 0) scale(0.3) rotate(0deg)', opacity: 0 },
+            {
+                transform: 'translate3d(' + (Math.cos(angle) * distance * 0.5) + 'px, ' + (Math.sin(angle) * distance * 0.5) + 'px, 0) scale(1.1) rotate(' + (spin * 0.35) + 'deg)',
+                opacity: 1,
+                offset: 0.22,
+            },
+            {
+                transform: 'translate3d(' + (Math.cos(angle) * distance) + 'px, ' + (Math.sin(angle) * distance + 26) + 'px, 0) scale(0.5) rotate(' + spin + 'deg)',
+                opacity: 0,
+            },
+        ], {
+            duration: 620 + Math.random() * 460,
+            delay: Math.random() * 90,
+            easing: 'cubic-bezier(.16,.84,.44,1)',
+        }));
+    });
+}
+
 el('btnShuffle').onclick = () => {
+    if (order.length === 0) return;
+
     for (let i = order.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [order[i], order[j]] = [order[j], order[i]];
     }
+
     pos = 0;
     render();
+    celebrateShuffle();
 };
 
 // --- Retour visuel des boutons de décision -----------------------------------
@@ -694,10 +776,6 @@ const litTimers = {};
 Object.entries(decisionButtons).forEach(([kind, button]) => {
     const host = button.querySelector('.burst');
 
-    const ring = document.createElement('span');
-    ring.className = 'burst__ring';
-    host.append(ring);
-
     const bits = [];
     for (let i = 0; i < BITS; i++) {
         const bit = document.createElement('span');
@@ -706,7 +784,7 @@ Object.entries(decisionButtons).forEach(([kind, button]) => {
         bits.push(bit);
     }
 
-    bursts[kind] = { ring, bits, flash: button.querySelector('.btn__flash'), glyph: button.querySelector('svg') };
+    bursts[kind] = { bits, flash: button.querySelector('.btn__flash'), glyph: button.querySelector('svg') };
 });
 
 // Les boutons portent l'état de la carte affichée, comme un bouton « j'aime ».
@@ -758,32 +836,40 @@ function celebrate(kind) {
         { opacity: 0 },
     ], { duration: 380, easing: 'ease-out' }));
 
-    keep(parts.ring.animate([
-        { transform: 'scale(0.08)', opacity: 1 },
-        { transform: 'scale(1.9)', opacity: 0 },
-    ], { duration: 540, easing: 'cubic-bezier(.16,.84,.44,1)' }));
-
     parts.bits.forEach((bit, i) => {
-        const angle = (i / BITS) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-        const distance = 58 + Math.random() * 38;
+        // Un secteur par particule pour que l'explosion reste équilibrée tout
+        // autour, mais un jitter presque aussi large que le secteur : deux
+        // voisines ne partent jamais du même angle.
+        const sector = (i / BITS) * Math.PI * 2;
+        const angle = sector + (Math.random() - 0.5) * (Math.PI * 2 / BITS) * 1.9;
+
+        // C'est la dispersion des rayons qui casse l'anneau. Le carré du hasard
+        // tasse la plupart des particules près du bouton et en envoie quelques
+        // unes très loin : un noyau dense et des éclats, jamais une couronne.
+        const distance = 18 + Math.pow(Math.random(), 2) * 124;
         const x = Math.cos(angle) * distance;
-        const y = Math.sin(angle) * distance * 0.78;
-        const spin = (Math.random() - 0.5) * 420;
+        const y = Math.sin(angle) * distance * 0.82;
+
+        const spin = (Math.random() - 0.5) * 540;
+        const size = 0.45 + Math.random() * 1.2;
+        const peak = 0.1 + Math.random() * 0.12;
 
         keep(bit.animate([
-            { transform: 'translate3d(0, 0, 0) scale(0.3) rotate(0deg)', opacity: 0 },
+            { transform: 'translate3d(0, 0, 0) scale(0.25) rotate(0deg)', opacity: 0 },
             {
-                transform: 'translate3d(' + (x * 0.66) + 'px, ' + (y * 0.66) + 'px, 0) scale(1.75) rotate(' + (spin * 0.3) + 'deg)',
+                transform: 'translate3d(' + (x * 0.6) + 'px, ' + (y * 0.6) + 'px, 0) scale(' + (size * 1.5).toFixed(2) + ') rotate(' + (spin * 0.3) + 'deg)',
                 opacity: 1,
-                offset: 0.14,
+                offset: peak,
             },
             {
-                transform: 'translate3d(' + x + 'px, ' + (y + 16) + 'px, 0) scale(0.15) rotate(' + spin + 'deg)',
+                transform: 'translate3d(' + x + 'px, ' + y + 'px, 0) scale(' + (size * 0.2).toFixed(2) + ') rotate(' + spin + 'deg)',
                 opacity: 0,
             },
         ], {
-            duration: 700 + i * 7,
-            delay: i * 2,
+            // Des durées très différentes : à un instant donné les particules
+            // ne sont jamais toutes au même rayon.
+            duration: 380 + Math.random() * 620,
+            delay: Math.random() * 80,
             easing: 'cubic-bezier(.12,.86,.36,1)',
         }));
     });

@@ -11,6 +11,11 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600, 700],
                 }),
+                // Titles only. Vendored at build time like the body face, so
+                // there is still no runtime request to a font CDN.
+                bunny('Fredoka', {
+                    weights: [500, 600],
+                }),
             ],
         }),
     ],

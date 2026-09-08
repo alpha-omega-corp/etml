@@ -13,7 +13,8 @@ Chaque utilisateur ouvre une session avec son seul nom, et ses cartes « je sais
 ## Navigation
 
 La colonne de gauche liste les chapitres et leur nombre de mots ; un filet la
-sépare du contenu, et un fil d'Ariane rappelle le chapitre ouvert.
+sépare du contenu, et le nom du chapitre ouvert titre la colonne de droite,
+avec le sens de lecture en pastille à l'autre bout de la même ligne.
 
 Sur téléphone c'est un tiroir latéral classique : une icône hamburger dans la
 barre du haut, un panneau qui glisse depuis la gauche par-dessus un voile, et une

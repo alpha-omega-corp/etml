@@ -74,13 +74,26 @@ class BranchesTest extends TestCase
         $this->assertSame($german->id, session('chapter_id'));
     }
 
-    public function test_breadcrumbs_name_the_chapter(): void
+    public function test_the_page_title_names_the_chapter(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('aria-label="Breadcrumb"', false)
+            ->assertSee('deck-head__title', false)
             ->assertSee('I. Der Mensch — Personalien &amp; Familie', false)
             ->assertDontSee('Allemand');
+    }
+
+    public function test_the_direction_pill_sits_opposite_the_title(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('dir-pill', $html);
+        // Title first, pill after it, in the same row.
+        $this->assertLessThan(
+            strpos($html, 'dir-pill'),
+            strpos($html, 'deck-head__title'),
+        );
+        $this->assertStringContainsString('id="dirFrDe" aria-pressed="true"', $html);
     }
 
     public function test_a_new_chapter_joins_the_branch_of_the_one_on_screen(): void
