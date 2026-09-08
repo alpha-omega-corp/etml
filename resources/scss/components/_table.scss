@@ -1,0 +1,73 @@
+@use '../abstracts' as *;
+
+// The wrapper is what scrolls, never the page. Always wrap a table in one.
+.table-wrap {
+    overflow-x: auto;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.table {
+    width: 100%;
+    font-size: var(--text-sm);
+    text-align: start;
+
+    th,
+    td {
+        padding: space(3) space(4);
+        text-align: start;
+        vertical-align: middle;
+    }
+
+    thead th {
+        font-size: var(--text-xs);
+        font-weight: 600;
+        letter-spacing: var(--tracking-wide);
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        white-space: nowrap;
+        background-color: var(--color-surface-muted);
+        border-block-end: 1px solid var(--color-border);
+    }
+
+    tbody tr + tr {
+        border-block-start: 1px solid var(--color-border);
+    }
+
+    tfoot {
+        border-block-start: 1px solid var(--color-border);
+
+        td {
+            font-weight: 500;
+            background-color: var(--color-surface-muted);
+        }
+    }
+}
+
+.table--hover tbody tr {
+    transition: background-color $duration-fast $ease-out;
+
+    &:hover {
+        background-color: var(--color-surface-muted);
+    }
+}
+
+.table--compact {
+    th,
+    td {
+        padding: space(2) space(3);
+    }
+}
+
+// Right-align a column of figures.
+.table__numeric {
+    font-variant-numeric: tabular-nums;
+    text-align: end !important;
+}
+
+.table__empty {
+    padding: space(10) space(4);
+    color: var(--color-text-muted);
+    text-align: center;
+}

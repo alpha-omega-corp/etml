@@ -1,0 +1,83 @@
+@use '../abstracts' as *;
+
+.alert {
+    --alert-bg: var(--color-surface-muted);
+    --alert-fg: var(--color-text);
+    --alert-accent: var(--color-border-strong);
+
+    display: flex;
+    gap: space(3);
+    padding: space(4);
+    font-size: var(--text-sm);
+    color: var(--alert-fg);
+    background-color: var(--alert-bg);
+    border: 1px solid color-mix(in oklab, var(--alert-accent) 35%, transparent);
+    border-inline-start: 3px solid var(--alert-accent);
+    border-radius: var(--radius-md);
+}
+
+.alert__icon {
+    flex-shrink: 0;
+    width: rem(20);
+    height: rem(20);
+    margin-block-start: 0.1em;
+    color: var(--alert-accent);
+}
+
+.alert__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.alert__title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.alert__title + .alert__message {
+    margin-block-start: space(1);
+}
+
+.alert__message {
+    color: color-mix(in oklab, var(--alert-fg) 80%, transparent);
+}
+
+.alert__dismiss {
+    @include focus-visible;
+
+    flex-shrink: 0;
+    align-self: flex-start;
+    padding: space(1);
+    color: inherit;
+    border-radius: var(--radius-sm);
+    opacity: 0.6;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    svg {
+        width: rem(16);
+        height: rem(16);
+    }
+}
+
+.alert--success {
+    --alert-bg: var(--color-success-soft);
+    --alert-accent: var(--color-success);
+}
+
+.alert--warning {
+    --alert-bg: var(--color-warning-soft);
+    --alert-accent: var(--color-warning);
+}
+
+.alert--danger {
+    --alert-bg: var(--color-danger-soft);
+    --alert-accent: var(--color-danger);
+}
+
+.alert--info {
+    --alert-bg: var(--color-info-soft);
+    --alert-accent: var(--color-info);
+}

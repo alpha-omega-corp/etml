@@ -1,0 +1,64 @@
+@use '../abstracts' as *;
+
+.spinner {
+    --spinner-size: #{rem(18)};
+
+    display: inline-block;
+    flex-shrink: 0;
+    width: var(--spinner-size);
+    height: var(--spinner-size);
+    border: 2px solid color-mix(in oklab, currentcolor 25%, transparent);
+    border-block-start-color: currentcolor;
+    border-radius: var(--radius-full);
+    animation: spin 700ms linear infinite;
+}
+
+.spinner--sm {
+    --spinner-size: #{rem(14)};
+}
+
+.spinner--lg {
+    --spinner-size: #{rem(28)};
+
+    border-width: 3px;
+}
+
+// Skeleton placeholder for content that has not loaded yet.
+.skeleton {
+    background-image: linear-gradient(
+        90deg,
+        var(--color-surface-muted) 0%,
+        color-mix(in oklab, var(--color-surface-muted) 60%, var(--color-border)) 50%,
+        var(--color-surface-muted) 100%
+    );
+    background-size: 200% 100%;
+    border-radius: var(--radius-sm);
+
+    @include motion-safe {
+        animation: skeleton 1.4s $ease-in-out infinite;
+    }
+}
+
+.skeleton--text {
+    height: 1em;
+
+    &:last-child {
+        width: 70%;
+    }
+}
+
+@keyframes spin {
+    to {
+        rotate: 360deg;
+    }
+}
+
+@keyframes skeleton {
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: -100% 0;
+    }
+}

@@ -1,0 +1,13 @@
+@use '../abstracts' as *;
+
+// Icons scale with the text they sit beside. Pass `size` to the component to
+// override the width/height for a one-off.
+.icon {
+    inline-size: var(--icon-size, 1.25em);
+    block-size: var(--icon-size, 1.25em);
+    flex-shrink: 0;
+}
+
+.icon--muted {
+    color: var(--color-text-muted);
+}

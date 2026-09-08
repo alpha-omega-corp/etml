@@ -1,0 +1,82 @@
+// -----------------------------------------------------------------------------
+// Utilities
+//
+// A deliberately small set. This is *not* a utility framework — if you find
+// yourself wanting a tenth variant of something, that is a signal the pattern
+// belongs in a component partial instead.
+// -----------------------------------------------------------------------------
+
+@use 'sass:map';
+@use '../abstracts' as *;
+
+.visually-hidden {
+    @include visually-hidden;
+}
+
+// Skip link: hidden until focused, then pinned to the top of the viewport.
+.skip-link {
+    @include visually-hidden;
+
+    &:focus-visible {
+        position: fixed;
+        z-index: layer('toast');
+        inset-block-start: space(3);
+        inset-inline-start: space(3);
+        width: auto;
+        height: auto;
+        padding: space(2) space(4);
+        clip-path: none;
+        color: var(--color-text);
+        background-color: var(--color-surface);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+    }
+}
+
+.truncate {
+    @include truncate;
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+.text-center {
+    text-align: center;
+}
+
+// Flow: vertical rhythm between siblings. `--flow` overrides the gap locally.
+.flow > * + * {
+    margin-block-start: var(--flow, #{space(4)});
+}
+
+// Cluster: a row of items that wraps. `--cluster-gap` overrides the gap.
+.cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cluster-gap, #{space(3)});
+    align-items: center;
+}
+
+// Stack: a column. `--stack-gap` overrides the gap.
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-gap, #{space(4)});
+}
+
+// Push everything after this element to the far end of a flex row.
+.push-end {
+    margin-inline-start: auto;
+}
+
+// Spacing escape hatches. Kept intentionally coarse.
+@each $step in (0, 2, 4, 6, 8, 12) {
+    .mt-#{$step} {
+        margin-block-start: map.get($spacing, $step);
+    }
+
+    .mb-#{$step} {
+        margin-block-end: map.get($spacing, $step);
+    }
+}

@@ -1,0 +1,150 @@
+// -----------------------------------------------------------------------------
+// Typography
+// Element-level defaults plus a `.prose` block for long-form, user-generated or
+// markdown-rendered content.
+// -----------------------------------------------------------------------------
+
+@use '../abstracts' as *;
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    text-wrap: balance;
+}
+
+h1 {
+    font-size: var(--text-4xl);
+}
+
+h2 {
+    font-size: var(--text-2xl);
+}
+
+h3 {
+    font-size: var(--text-xl);
+}
+
+h4 {
+    font-size: var(--text-lg);
+}
+
+h5,
+h6 {
+    font-size: var(--text-base);
+}
+
+p {
+    text-wrap: pretty;
+}
+
+a {
+    color: var(--color-accent);
+    text-decoration-color: color-mix(in oklab, var(--color-accent) 40%, transparent);
+    text-underline-offset: 0.2em;
+    transition: color $duration-fast $ease-out;
+
+    &:hover {
+        color: var(--color-accent-hover);
+        text-decoration-color: currentcolor;
+    }
+}
+
+strong,
+b {
+    font-weight: 600;
+}
+
+small {
+    font-size: var(--text-sm);
+}
+
+code,
+kbd,
+samp,
+pre {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+:not(pre) > code {
+    padding: 0.15em 0.4em;
+    color: var(--color-text);
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+pre {
+    padding: space(4);
+    overflow-x: auto;
+    color: var(--color-text);
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    code {
+        padding: 0;
+        background: none;
+        border: 0;
+    }
+}
+
+hr {
+    height: 1px;
+    border: 0;
+    background-color: var(--color-border);
+}
+
+blockquote {
+    padding-inline-start: space(4);
+    color: var(--color-text-muted);
+    border-inline-start: 2px solid var(--color-accent);
+}
+
+// Long-form content ----------------------------------------------------------
+
+.prose {
+    max-width: 68ch;
+
+    > * + * {
+        margin-block-start: space(4);
+    }
+
+    > h2 {
+        margin-block-start: space(10);
+    }
+
+    > h3 {
+        margin-block-start: space(8);
+    }
+
+    ul,
+    ol {
+        padding-inline-start: space(6);
+    }
+
+    li + li {
+        margin-block-start: space(2);
+    }
+}
+
+// The eyebrow label above a heading.
+.eyebrow {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+}
+
+.lead {
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+}

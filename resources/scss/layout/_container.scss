@@ -1,0 +1,73 @@
+@use '../abstracts' as *;
+
+.container {
+    @include container;
+}
+
+.container--narrow {
+    @include container($container-narrow);
+}
+
+.container--wide {
+    @include container(100%);
+}
+
+// The main content column of a page. Gives every page the same top/bottom
+// breathing room so individual views do not each invent their own.
+.page {
+    padding-block: space(10) space(16);
+
+    @include up('md') {
+        padding-block: space(16) space(24);
+    }
+}
+
+.page__header {
+    margin-block-end: space(8);
+}
+
+.page__title {
+    font-size: var(--text-3xl);
+
+    @include up('md') {
+        font-size: var(--text-4xl);
+    }
+}
+
+// Page shells ----------------------------------------------------------------
+
+.app-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+}
+
+.app-main {
+    flex: 1;
+}
+
+.app-body--centered {
+    justify-content: center;
+    padding: space(6) space(4);
+}
+
+.centered-panel {
+    width: 100%;
+    max-width: rem(400);
+    margin-inline: auto;
+}
+
+.centered-panel__brand {
+    display: inline-flex;
+    gap: space(2);
+    align-items: center;
+    margin-block-end: space(6);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+
+    svg {
+        color: var(--color-accent);
+    }
+}

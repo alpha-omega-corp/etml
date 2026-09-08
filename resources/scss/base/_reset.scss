@@ -1,0 +1,115 @@
+// -----------------------------------------------------------------------------
+// Reset
+// A short, opinionated reset. Everything here is a global decision — resist
+// adding component styling to this file.
+// -----------------------------------------------------------------------------
+
+@use '../abstracts' as *;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+body {
+    min-height: 100svh;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--color-text);
+    background-color: var(--color-canvas);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+svg {
+    fill: none;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    overflow-wrap: break-word;
+}
+
+ul[class],
+ol[class] {
+    padding: 0;
+    list-style: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+:target {
+    scroll-margin-block-start: calc(var(--header-height) + #{space(4)});
+}
+
+// Only ever show focus rings for keyboard users; `:focus-visible` handles the
+// distinction for us.
+:focus-visible {
+    @include focus-ring;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+::selection {
+    color: var(--color-accent-contrast);
+    background-color: var(--color-accent);
+}
+
+[hidden] {
+    display: none !important;
+}

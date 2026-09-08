@@ -1,0 +1,116 @@
+@use '../abstracts' as *;
+
+.site-header {
+    position: sticky;
+    z-index: layer('header');
+    inset-block-start: 0;
+    background-color: color-mix(in oklab, var(--color-canvas) 88%, transparent);
+    border-block-end: 1px solid var(--color-border);
+    backdrop-filter: blur(12px);
+}
+
+.site-header__inner {
+    @include container;
+
+    display: flex;
+    gap: space(6);
+    align-items: center;
+    min-height: var(--header-height);
+}
+
+.site-header__brand {
+    display: inline-flex;
+    gap: space(2);
+    align-items: center;
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-text);
+    text-decoration: none;
+
+    &:hover {
+        color: var(--color-text);
+    }
+
+    svg {
+        color: var(--color-accent);
+    }
+}
+
+.site-header__nav {
+    display: none;
+
+    @include up('md') {
+        display: flex;
+        gap: space(1);
+        align-items: center;
+    }
+}
+
+.site-header__actions {
+    display: flex;
+    gap: space(2);
+    align-items: center;
+    margin-inline-start: auto;
+}
+
+// Mobile drawer --------------------------------------------------------------
+
+.site-header__toggle {
+    @include focus-visible;
+
+    display: inline-flex;
+    padding: space(2);
+    color: var(--color-text-muted);
+    border-radius: var(--radius-md);
+
+    &:hover {
+        color: var(--color-text);
+        background-color: var(--color-surface-muted);
+    }
+
+    @include up('md') {
+        display: none;
+    }
+}
+
+.site-header__drawer {
+    display: grid;
+    gap: space(1);
+    padding-block: space(3) space(5);
+    border-block-start: 1px solid var(--color-border);
+
+    @include up('md') {
+        display: none;
+    }
+}
+
+// Nav links ------------------------------------------------------------------
+
+.nav-link {
+    @include focus-visible;
+
+    display: block;
+    padding: space(2) space(3);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: color $duration-fast $ease-out, background-color $duration-fast $ease-out;
+
+    &:hover {
+        color: var(--color-text);
+        background-color: var(--color-surface-muted);
+    }
+}
+
+.nav-link--active {
+    color: var(--color-accent);
+    background-color: var(--color-accent-soft);
+
+    &:hover {
+        color: var(--color-accent-hover);
+        background-color: var(--color-accent-soft);
+    }
+}

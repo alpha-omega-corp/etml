@@ -1,0 +1,113 @@
+@use '../abstracts' as *;
+
+.toast-region {
+    position: fixed;
+    z-index: layer('toast');
+    inset-block-end: space(4);
+    inset-inline: space(4);
+    display: grid;
+    gap: space(3);
+    justify-items: stretch;
+    pointer-events: none;
+
+    @include up('sm') {
+        inset-inline: auto space(6);
+        inset-block-end: space(6);
+        justify-items: end;
+    }
+}
+
+.toast {
+    --toast-accent: var(--color-accent);
+
+    display: flex;
+    gap: space(3);
+    align-items: flex-start;
+    width: 100%;
+    max-width: rem(380);
+    padding: space(3) space(4);
+    font-size: var(--text-sm);
+    pointer-events: auto;
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-inline-start: 3px solid var(--toast-accent);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+
+    @include motion-safe {
+        animation: toast-in $duration-base $ease-out;
+    }
+}
+
+.toast--success {
+    --toast-accent: var(--color-success);
+}
+
+.toast--warning {
+    --toast-accent: var(--color-warning);
+}
+
+.toast--danger {
+    --toast-accent: var(--color-danger);
+}
+
+.toast__icon {
+    flex-shrink: 0;
+    width: rem(18);
+    height: rem(18);
+    margin-block-start: 0.15em;
+    color: var(--toast-accent);
+}
+
+.toast__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast__title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.toast__message {
+    color: var(--color-text-muted);
+}
+
+.toast__dismiss {
+    @include focus-visible;
+
+    flex-shrink: 0;
+    padding: space(1);
+    color: var(--color-text-subtle);
+    border-radius: var(--radius-sm);
+
+    &:hover {
+        color: var(--color-text);
+    }
+
+    svg {
+        width: rem(14);
+        height: rem(14);
+    }
+}
+
+.toast--leaving {
+    @include motion-safe {
+        animation: toast-out $duration-base $ease-in-out forwards;
+    }
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        translate: 0 #{rem(12)};
+    }
+}
+
+@keyframes toast-out {
+    to {
+        opacity: 0;
+        scale: 0.97;
+        translate: 0 #{rem(6)};
+    }
+}

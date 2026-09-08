@@ -1,0 +1,73 @@
+@use '../abstracts' as *;
+
+// The component gallery at /ui-kit. Nothing here is needed by an application
+// page — delete this partial along with the route once the kit is familiar.
+.spec + .spec {
+    margin-block-start: space(16);
+}
+
+.spec__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(3);
+    align-items: baseline;
+    padding-block-end: space(3);
+    margin-block-end: space(6);
+    border-block-end: 1px solid var(--color-border);
+}
+
+.spec__title {
+    font-size: var(--text-xl);
+}
+
+.spec__meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+}
+
+.spec__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(4);
+    align-items: center;
+}
+
+.spec__row + .spec__row {
+    margin-block-start: space(5);
+}
+
+.spec__panel {
+    padding: space(6);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.swatches {
+    display: grid;
+    gap: space(3);
+    grid-template-columns: repeat(auto-fit, minmax(#{rem(120)}, 1fr));
+}
+
+.swatch__chip {
+    height: rem(52);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.swatch__name {
+    margin-block-start: space(2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+// An explanatory paragraph at the top of a spec panel, for the sections where
+// the markup alone does not convey the rules.
+.spec__note {
+    max-width: 68ch;
+    margin-block-end: space(5);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}

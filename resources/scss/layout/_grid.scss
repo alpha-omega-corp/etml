@@ -1,0 +1,31 @@
+@use '../abstracts' as *;
+
+// Auto-fitting grid. `--grid-min` sets the smallest acceptable column width;
+// the browser decides the column count from there — no breakpoints needed.
+.grid {
+    display: grid;
+    gap: var(--grid-gap, #{space(6)});
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--grid-min, #{rem(260)}), 100%), 1fr));
+}
+
+// A fixed two-column split that collapses on small screens.
+.split {
+    display: grid;
+    gap: var(--split-gap, #{space(8)});
+
+    @include up('lg') {
+        grid-template-columns: var(--split-columns, 1fr 1fr);
+        align-items: var(--split-align, start);
+    }
+}
+
+// Sidebar + content shell.
+.shell {
+    display: grid;
+    gap: space(8);
+
+    @include up('lg') {
+        grid-template-columns: #{rem(240)} minmax(0, 1fr);
+        align-items: start;
+    }
+}

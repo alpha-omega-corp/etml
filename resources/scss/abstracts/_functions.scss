@@ -1,0 +1,41 @@
+// -----------------------------------------------------------------------------
+// Functions
+// -----------------------------------------------------------------------------
+
+@use 'sass:map';
+@use 'sass:math';
+@use 'variables' as v;
+
+/// Look up a step on the spacing scale.
+/// @example padding: space(4) space(6);
+@function space($step) {
+    @if not map.has-key(v.$spacing, $step) {
+        @error 'Unknown spacing step `#{$step}`. Available: #{map.keys(v.$spacing)}.';
+    }
+
+    @return map.get(v.$spacing, $step);
+}
+
+/// Look up a z-index layer.
+/// @example z-index: layer('modal');
+@function layer($name) {
+    @if not map.has-key(v.$layers, $name) {
+        @error 'Unknown layer `#{$name}`. Available: #{map.keys(v.$layers)}.';
+    }
+
+    @return map.get(v.$layers, $name);
+}
+
+/// Look up a breakpoint value.
+@function breakpoint($name) {
+    @if not map.has-key(v.$breakpoints, $name) {
+        @error 'Unknown breakpoint `#{$name}`. Available: #{map.keys(v.$breakpoints)}.';
+    }
+
+    @return map.get(v.$breakpoints, $name);
+}
+
+/// Convert a px value to rem, assuming a 16px root.
+@function rem($px) {
+    @return math.div($px, 16) * 1rem;
+}

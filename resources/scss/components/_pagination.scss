@@ -1,0 +1,66 @@
+@use '../abstracts' as *;
+
+// Styles Laravel's published pagination views as well as the
+// `<x-ui.pagination>` component.
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(4);
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pagination__summary {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.pagination__list {
+    display: flex;
+    gap: space(1);
+    align-items: center;
+}
+
+.pagination__link {
+    @include focus-visible;
+
+    display: inline-grid;
+    place-items: center;
+    min-width: rem(34);
+    height: rem(34);
+    padding-inline: space(2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: background-color $duration-fast $ease-out, color $duration-fast $ease-out;
+
+    &:hover {
+        color: var(--color-text);
+        background-color: var(--color-surface-muted);
+    }
+
+    svg {
+        width: rem(15);
+        height: rem(15);
+    }
+}
+
+.pagination__link--current {
+    color: var(--color-accent-contrast);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+
+    &:hover {
+        color: var(--color-accent-contrast);
+        background-color: var(--color-accent-hover);
+    }
+}
+
+.pagination__link--disabled {
+    pointer-events: none;
+    color: var(--color-text-subtle);
+    opacity: 0.6;
+}

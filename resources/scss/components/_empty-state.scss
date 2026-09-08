@@ -1,0 +1,40 @@
+@use '../abstracts' as *;
+
+.empty-state {
+    display: grid;
+    justify-items: center;
+    padding: space(12) space(6);
+    text-align: center;
+}
+
+.empty-state__icon {
+    display: grid;
+    place-items: center;
+    width: rem(48);
+    height: rem(48);
+    margin-block-end: space(4);
+    color: var(--color-text-muted);
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-full);
+
+    svg {
+        width: rem(22);
+        height: rem(22);
+    }
+}
+
+.empty-state__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+}
+
+.empty-state__message {
+    max-width: 44ch;
+    margin-block-start: space(2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.empty-state__actions {
+    margin-block-start: space(6);
+}

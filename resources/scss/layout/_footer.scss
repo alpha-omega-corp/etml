@@ -1,0 +1,25 @@
+@use '../abstracts' as *;
+
+.site-footer {
+    margin-block-start: auto;
+    padding-block: space(8);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    border-block-start: 1px solid var(--color-border);
+}
+
+.site-footer__inner {
+    @include container;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(4);
+    align-items: center;
+    justify-content: space-between;
+}
+
+.site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(5);
+}

@@ -1,0 +1,172 @@
+@use '../abstracts' as *;
+
+// Local custom properties are the variant API: a modifier only needs to swap
+// `--btn-*` values rather than restate the whole rule. Hover has its own three
+// tokens so a variant can redirect its hover without a nested `&:hover` block.
+.btn {
+    @include focus-visible;
+
+    --btn-bg: var(--color-surface);
+    --btn-fg: var(--color-text);
+    --btn-border: color-mix(in oklab, var(--color-accent) 38%, var(--color-border-strong));
+    --btn-bg-hover: var(--color-accent-soft);
+    --btn-fg-hover: var(--color-accent);
+    --btn-border-hover: var(--color-accent);
+    --btn-shadow: var(--shadow-xs);
+
+    display: inline-flex;
+    gap: space(2);
+    align-items: center;
+    justify-content: center;
+    padding: space(2) space(4);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--btn-fg);
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--btn-shadow);
+    transition:
+        background-color $duration-fast $ease-out,
+        border-color $duration-fast $ease-out,
+        color $duration-fast $ease-out,
+        transform $duration-fast $ease-out;
+
+    &:hover {
+        color: var(--btn-fg-hover);
+        background-color: var(--btn-bg-hover);
+        border-color: var(--btn-border-hover);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:disabled,
+    &[aria-disabled='true'] {
+        pointer-events: none;
+        opacity: 0.55;
+    }
+
+    svg {
+        flex-shrink: 0;
+        width: 1.15em;
+        height: 1.15em;
+    }
+}
+
+// Variants -------------------------------------------------------------------
+
+.btn--primary {
+    --btn-bg: var(--color-accent);
+    --btn-fg: var(--color-accent-contrast);
+    --btn-border: var(--color-accent);
+    --btn-bg-hover: var(--color-accent-hover);
+    --btn-fg-hover: var(--color-accent-contrast);
+    --btn-border-hover: var(--color-accent-hover);
+    --btn-shadow: var(--shadow-sm);
+}
+
+.btn--danger {
+    --btn-bg: var(--color-danger);
+    --btn-fg: #fff;
+    --btn-border: var(--color-danger);
+    --btn-bg-hover: color-mix(in oklab, var(--color-danger) 85%, black);
+    --btn-fg-hover: #fff;
+    --btn-border-hover: color-mix(in oklab, var(--color-danger) 85%, black);
+}
+
+.btn--ghost {
+    --btn-bg: transparent;
+    --btn-border: transparent;
+    --btn-fg: var(--color-text-muted);
+    --btn-bg-hover: var(--color-surface-muted);
+    --btn-fg-hover: var(--color-text);
+    --btn-border-hover: transparent;
+    --btn-shadow: none;
+}
+
+.btn--link {
+    --btn-bg: transparent;
+    --btn-border: transparent;
+    --btn-bg-hover: transparent;
+    --btn-fg: var(--color-accent);
+    --btn-fg-hover: var(--color-accent-hover);
+    --btn-border-hover: transparent;
+    --btn-shadow: none;
+
+    padding-inline: 0;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+
+    &:active {
+        transform: none;
+    }
+}
+
+// Sizes ----------------------------------------------------------------------
+
+.btn--sm {
+    padding: space(1) space(3);
+    font-size: var(--text-xs);
+}
+
+.btn--lg {
+    padding: space(3) space(6);
+    font-size: var(--text-base);
+}
+
+// Shapes ---------------------------------------------------------------------
+
+.btn--block {
+    width: 100%;
+}
+
+.btn--icon {
+    padding: space(2);
+    aspect-ratio: 1;
+}
+
+.btn--pill {
+    border-radius: var(--radius-full);
+}
+
+// Loading state: the icon slot is replaced by a spinner and the label dims.
+.btn--loading {
+    pointer-events: none;
+
+    .btn__label {
+        opacity: 0.7;
+    }
+}
+
+.btn-group {
+    display: inline-flex;
+
+    .btn {
+        border-radius: 0;
+
+        &:first-child {
+            border-start-start-radius: var(--radius-md);
+            border-end-start-radius: var(--radius-md);
+        }
+
+        &:last-child {
+            border-start-end-radius: var(--radius-md);
+            border-end-end-radius: var(--radius-md);
+        }
+
+        + .btn {
+            margin-inline-start: -1px;
+        }
+
+        &:hover,
+        &:focus-visible {
+            z-index: layer('raised');
+        }
+    }
+}

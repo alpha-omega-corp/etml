@@ -1,0 +1,70 @@
+// -----------------------------------------------------------------------------
+// Design tokens (Sass side)
+//
+// Values that must exist at *compile* time live here: breakpoints, the spacing
+// scale, z-index layers. Anything a theme needs to override at *runtime* lives
+// in `base/_root.scss` as a CSS custom property instead.
+// -----------------------------------------------------------------------------
+
+@use 'sass:map';
+
+// Breakpoints -----------------------------------------------------------------
+
+$breakpoints: (
+    'sm': 40rem,   // 640px
+    'md': 48rem,   // 768px
+    'lg': 64rem,   // 1024px
+    'xl': 80rem,   // 1280px
+    '2xl': 96rem,  // 1536px
+) !default;
+
+// Spacing ---------------------------------------------------------------------
+// A 4px-based scale. Use `space(4)` rather than raw rem values so rhythm stays
+// consistent across components.
+
+$space-unit: 0.25rem !default;
+
+$spacing: (
+    0: 0,
+    1: $space-unit * 1,
+    2: $space-unit * 2,
+    3: $space-unit * 3,
+    4: $space-unit * 4,
+    5: $space-unit * 5,
+    6: $space-unit * 6,
+    8: $space-unit * 8,
+    10: $space-unit * 10,
+    12: $space-unit * 12,
+    16: $space-unit * 16,
+    20: $space-unit * 20,
+    24: $space-unit * 24,
+    32: $space-unit * 32,
+) !default;
+
+// Layout ----------------------------------------------------------------------
+
+$container-max: 75rem !default;
+$container-narrow: 48rem !default;
+$container-gutter: map.get($spacing, 5) !default;
+
+// Z-index layers --------------------------------------------------------------
+// Never write a bare z-index in a component; add a layer here instead.
+
+$layers: (
+    'base': 0,
+    'raised': 10,
+    'sticky': 100,
+    'header': 200,
+    'dropdown': 300,
+    'overlay': 400,
+    'modal': 500,
+    'toast': 600,
+) !default;
+
+// Motion ----------------------------------------------------------------------
+
+$duration-fast: 120ms !default;
+$duration-base: 200ms !default;
+$duration-slow: 320ms !default;
+$ease-out: cubic-bezier(0.22, 1, 0.36, 1) !default;
+$ease-in-out: cubic-bezier(0.65, 0, 0.35, 1) !default;

@@ -1,0 +1,5 @@
+// Forwarded so a single `@use '../abstracts' as *;` gives a partial everything
+// it needs: tokens, functions and mixins.
+@forward 'variables';
+@forward 'functions';
+@forward 'mixins';

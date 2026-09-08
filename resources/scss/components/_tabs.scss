@@ -1,0 +1,51 @@
+@use '../abstracts' as *;
+
+.tabs__list {
+    display: flex;
+    gap: space(1);
+    overflow-x: auto;
+    border-block-end: 1px solid var(--color-border);
+}
+
+.tabs__tab {
+    @include focus-visible(-2px);
+
+    position: relative;
+    padding: space(3) space(4);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    transition: color $duration-fast $ease-out;
+
+    &::after {
+        position: absolute;
+        content: '';
+        inset-block-end: -1px;
+        inset-inline: space(2);
+        height: 2px;
+        background-color: transparent;
+        border-radius: var(--radius-full);
+        transition: background-color $duration-fast $ease-out;
+    }
+
+    &:hover {
+        color: var(--color-text);
+    }
+
+    &[aria-selected='true'] {
+        color: var(--color-accent);
+
+        &::after {
+            background-color: var(--color-accent);
+        }
+    }
+}
+
+.tabs__panel {
+    padding-block-start: space(6);
+
+    &:focus-visible {
+        outline: none;
+    }
+}

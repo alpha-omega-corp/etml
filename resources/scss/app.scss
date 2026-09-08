@@ -1,0 +1,20 @@
+// -----------------------------------------------------------------------------
+// Application stylesheet
+//
+// Load order matters and is the whole point of this file:
+//
+//   1. abstracts  — tokens, functions, mixins. Emits no CSS.
+//   2. base       — custom properties, reset, element defaults, utilities.
+//   3. layout     — page skeleton: container, grid, header, footer, sidebar.
+//   4. components — one partial per UI component, mirroring resources/views/components/ui.
+//   5. pages      — view-specific styles. Keep this layer thin; if a pattern
+//                   shows up twice, promote it to `components/`.
+//
+// Add a partial by creating the file and forwarding it from that layer's
+// `_index.scss` — never `@use` a partial from here directly.
+// -----------------------------------------------------------------------------
+
+@use 'base';
+@use 'layout';
+@use 'components';
+@use 'pages';

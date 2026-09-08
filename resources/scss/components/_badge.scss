@@ -1,0 +1,62 @@
+@use '../abstracts' as *;
+
+.badge {
+    --badge-bg: var(--color-surface-muted);
+    --badge-fg: var(--color-text-muted);
+
+    display: inline-flex;
+    gap: space(1);
+    align-items: center;
+    padding: 0.15em space(2);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--badge-fg);
+    white-space: nowrap;
+    background-color: var(--badge-bg);
+    border-radius: var(--radius-full);
+
+    svg {
+        width: 1em;
+        height: 1em;
+    }
+}
+
+.badge--accent {
+    --badge-bg: var(--color-accent-soft);
+    --badge-fg: var(--color-accent);
+}
+
+.badge--success {
+    --badge-bg: var(--color-success-soft);
+    --badge-fg: var(--color-success);
+}
+
+.badge--warning {
+    --badge-bg: var(--color-warning-soft);
+    --badge-fg: var(--color-warning);
+}
+
+.badge--danger {
+    --badge-bg: var(--color-danger-soft);
+    --badge-fg: var(--color-danger);
+}
+
+.badge--info {
+    --badge-bg: var(--color-info-soft);
+    --badge-fg: var(--color-info);
+}
+
+.badge--outline {
+    --badge-bg: transparent;
+
+    border: 1px solid var(--color-border-strong);
+}
+
+// A small coloured disc, for status rows where the label carries the meaning.
+.badge__dot {
+    width: 0.5em;
+    height: 0.5em;
+    background-color: currentcolor;
+    border-radius: var(--radius-full);
+}

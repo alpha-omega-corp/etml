@@ -1,0 +1,96 @@
+@use '../abstracts' as *;
+
+.card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xs);
+}
+
+.card__header,
+.card__footer {
+    padding: space(4) space(5);
+}
+
+.card__header {
+    display: flex;
+    gap: space(3);
+    align-items: flex-start;
+    border-block-end: 1px solid var(--color-border);
+}
+
+.card__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+}
+
+.card__subtitle {
+    margin-block-start: space(1);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.card__body {
+    flex: 1;
+    padding: space(5);
+}
+
+.card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(3);
+    align-items: center;
+    background-color: var(--color-surface-muted);
+    border-block-start: 1px solid var(--color-border);
+    border-end-start-radius: var(--radius-lg);
+    border-end-end-radius: var(--radius-lg);
+}
+
+.card--flush {
+    .card__body {
+        padding: 0;
+    }
+}
+
+.card--muted {
+    background-color: var(--color-surface-muted);
+    box-shadow: none;
+}
+
+// An entire card that behaves as one link. The card keeps semantic markup; the
+// anchor inside it is stretched over the whole surface.
+.card--interactive {
+    position: relative;
+    transition: border-color $duration-base $ease-out, box-shadow $duration-base $ease-out,
+        transform $duration-base $ease-out;
+
+    &:hover {
+        border-color: var(--color-border-strong);
+        box-shadow: var(--shadow-md);
+
+        @include motion-safe {
+            transform: translateY(-2px);
+        }
+    }
+
+    &:focus-within {
+        @include focus-ring;
+    }
+
+    .card__link {
+        text-decoration: none;
+
+        &::after {
+            position: absolute;
+            content: '';
+            inset: 0;
+            border-radius: inherit;
+        }
+
+        &:focus-visible {
+            outline: none;
+        }
+    }
+}

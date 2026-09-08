@@ -1,0 +1,261 @@
+@use '../abstracts' as *;
+
+// Field: the label + control + hint/error unit. Every form control should be
+// wrapped in one so spacing and error placement stay uniform.
+.field {
+    display: grid;
+    gap: space(2);
+}
+
+// A radio group is a <fieldset> so it can carry a <legend>; strip the browser's
+// default chrome so it looks like every other field.
+fieldset.field {
+    min-inline-size: 0;
+    padding: 0;
+    border: 0;
+}
+
+.field__label {
+    display: inline-flex;
+    gap: space(1);
+    align-items: baseline;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.field__required {
+    color: var(--color-danger);
+}
+
+.field__hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+.field__error {
+    display: flex;
+    gap: space(1);
+    align-items: center;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-danger);
+
+    svg {
+        width: 1em;
+        height: 1em;
+    }
+}
+
+// Controls -------------------------------------------------------------------
+
+.input,
+.textarea,
+.select {
+    width: 100%;
+    padding: space(2) space(3);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-xs);
+    transition: border-color $duration-fast $ease-out, box-shadow $duration-fast $ease-out;
+
+    &::placeholder {
+        color: var(--color-text-subtle);
+    }
+
+    &:hover:not(:disabled, [readonly]) {
+        border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-border-strong));
+    }
+
+    &:focus-visible {
+        border-color: var(--color-accent);
+        outline: none;
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent);
+    }
+
+    &:disabled,
+    &[readonly] {
+        color: var(--color-text-muted);
+        background-color: var(--color-surface-muted);
+        cursor: not-allowed;
+    }
+
+    // Set by the Blade components whenever the field has a validation error.
+    &[aria-invalid='true'] {
+        border-color: var(--color-danger);
+
+        &:focus-visible {
+            box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-danger) 22%, transparent);
+        }
+    }
+}
+
+.textarea {
+    min-height: rem(96);
+    resize: vertical;
+    field-sizing: content;
+}
+
+.select {
+    padding-inline-end: space(8);
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="%236b655c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8l4 4 4-4"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right space(3) center;
+    background-size: rem(18);
+    appearance: none;
+
+    @include dark {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="%23a49d92" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8l4 4 4-4"/></svg>');
+    }
+}
+
+// An input with a leading or trailing adornment (icon, unit, button).
+.input-group {
+    display: flex;
+    align-items: stretch;
+
+    .input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    > :first-child:not(:last-child) {
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+    }
+
+    > :last-child:not(:first-child) {
+        margin-inline-start: -1px;
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+    }
+}
+
+.input-group__addon {
+    display: inline-flex;
+    align-items: center;
+    padding-inline: space(3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+}
+
+// Checkbox / radio -----------------------------------------------------------
+
+.choice {
+    display: flex;
+    gap: space(3);
+    align-items: flex-start;
+    cursor: pointer;
+
+    &:has(input:disabled) {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.choice__control {
+    flex-shrink: 0;
+    width: rem(18);
+    height: rem(18);
+    margin-block-start: 0.15em;
+    accent-color: var(--color-accent);
+
+    @include focus-visible;
+}
+
+.choice__text {
+    font-size: var(--text-sm);
+}
+
+.choice__label {
+    display: block;
+    font-weight: 500;
+}
+
+.choice__hint {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+.choice-group {
+    display: grid;
+    gap: space(3);
+}
+
+// A switch-styled checkbox.
+.switch {
+    display: flex;
+    gap: space(3);
+    align-items: center;
+    cursor: pointer;
+}
+
+.switch__control {
+    @include focus-visible;
+
+    position: relative;
+    flex-shrink: 0;
+    width: rem(38);
+    height: rem(22);
+    appearance: none;
+    background-color: var(--color-border-strong);
+    border-radius: var(--radius-full);
+    transition: background-color $duration-base $ease-out;
+
+    &::after {
+        position: absolute;
+        content: '';
+        inset-block-start: rem(3);
+        inset-inline-start: rem(3);
+        width: rem(16);
+        height: rem(16);
+        background-color: #fff;
+        border-radius: var(--radius-full);
+        box-shadow: var(--shadow-xs);
+        transition: translate $duration-base $ease-out;
+    }
+
+    &:checked {
+        background-color: var(--color-accent);
+
+        &::after {
+            translate: rem(16) 0;
+        }
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+// Fieldset -------------------------------------------------------------------
+
+.fieldset {
+    display: grid;
+    gap: space(5);
+    padding: 0;
+    border: 0;
+}
+
+.fieldset__legend {
+    padding: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(3);
+    align-items: center;
+    margin-block-start: space(6);
+}

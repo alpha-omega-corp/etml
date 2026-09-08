@@ -1,0 +1,772 @@
+[
+  {
+    "sec": "Personalien",
+    "de": "der Mensch, en, en",
+    "fr": "l'homme, l'être humain"
+  },
+  {
+    "sec": "Personalien",
+    "de": "die Leute (Pl.)",
+    "fr": "les gens"
+  },
+  {
+    "sec": "Personalien",
+    "de": "die Person, en",
+    "fr": "la personne, le personnage"
+  },
+  {
+    "sec": "Personalien",
+    "de": "persönlich",
+    "fr": "personnel"
+  },
+  {
+    "sec": "Personalien",
+    "de": "die Persönlichkeit, en",
+    "fr": "la personnalité"
+  },
+  {
+    "sec": "Personalien",
+    "de": "die Frau, en",
+    "fr": "la femme, l'épouse",
+    "ex": "Frau Müller → madame Müller"
+  },
+  {
+    "sec": "Personalien",
+    "de": "das Fräulein, -",
+    "fr": "la demoiselle, mademoiselle"
+  },
+  {
+    "sec": "Personalien",
+    "de": "das Mädchen, -",
+    "fr": "la jeune fille, la fillette"
+  },
+  {
+    "sec": "Personalien",
+    "de": "weiblich",
+    "fr": "féminin"
+  },
+  {
+    "sec": "Personalien",
+    "de": "der Herr, n, en",
+    "fr": "le monsieur, le seigneur, le maître"
+  },
+  {
+    "sec": "Personalien",
+    "de": "der Mann, ¨er",
+    "fr": "l'homme, le mari"
+  },
+  {
+    "sec": "Personalien",
+    "de": "männlich",
+    "fr": "masculin, viril"
+  },
+  {
+    "sec": "Personalien",
+    "de": "das Alter, -",
+    "fr": "l'âge, la vieillesse",
+    "ex": "im Alter von 41 Jahren → à l'âge de 41 ans"
+  },
+  {
+    "sec": "Personalien",
+    "de": "alt",
+    "fr": "vieux, âgé",
+    "ex": "Wie alt sind Sie? – Ich bin 18 (Jahre alt). Im Mai werde ich 19 (Jahre alt)."
+  },
+  {
+    "sec": "Personalien",
+    "de": "erwachsen",
+    "fr": "adulte",
+    "ex": "ein Erwachsener → un adulte"
+  },
+  {
+    "sec": "Personalien",
+    "de": "das Kind, er",
+    "fr": "l'enfant"
+  },
+  {
+    "sec": "Personalien",
+    "de": "das Einzelkind, er",
+    "fr": "l'enfant unique"
+  },
+  {
+    "sec": "Personalien",
+    "de": "die Jugend, /",
+    "fr": "la jeunesse"
+  },
+  {
+    "sec": "Personalien",
+    "de": "jung",
+    "fr": "jeune"
+  },
+  {
+    "sec": "Personalien",
+    "de": "der Jugendliche (adj. n.)",
+    "fr": "le jeune, l'adolescent"
+  },
+  {
+    "sec": "Personalien",
+    "de": "der Junge, n, n",
+    "fr": "le garçon"
+  },
+  {
+    "sec": "Personalien",
+    "de": "die Geburt, en",
+    "fr": "la naissance"
+  },
+  {
+    "sec": "Personalien",
+    "de": "der Geburtstag, e",
+    "fr": "l'anniversaire (de la naissance)"
+  },
+  {
+    "sec": "Personalien",
+    "de": "geboren",
+    "fr": "né (je suis né)",
+    "ex": "Er ist am 20. Oktober geboren. → Il est né le 20 octobre."
+  },
+  {
+    "sec": "Personalien",
+    "de": "leben",
+    "fr": "vivre"
+  },
+  {
+    "sec": "Personalien",
+    "de": "das Leben, -",
+    "fr": "la vie"
+  },
+  {
+    "sec": "Personalien",
+    "de": "lebendig",
+    "fr": "vivant"
+  },
+  {
+    "sec": "Personalien",
+    "de": "*werden",
+    "fr": "devenir",
+    "ex": "wird, wurde, ist geworden — Er wurde ein berühmter Arzt. Warum ist er rot geworden?"
+  },
+  {
+    "sec": "Personalien",
+    "de": "*sterben (an + D)",
+    "fr": "mourir (de)",
+    "ex": "stirbt, starb, ist gestorben — Er ist an einer schweren Krankheit gestorben."
+  },
+  {
+    "sec": "Personalien",
+    "de": "der Tod, /",
+    "fr": "la mort"
+  },
+  {
+    "sec": "Personalien",
+    "de": "tot (der Tote, adj. n.)",
+    "fr": "mort (le mort)"
+  },
+  {
+    "sec": "Personalien",
+    "de": "töten",
+    "fr": "tuer"
+  },
+  {
+    "sec": "Personalien",
+    "de": "heißen",
+    "fr": "s'appeler",
+    "ex": "heißt, hieß, hat geheißen — Wie heißt du mit Vornamen?"
+  },
+  {
+    "sec": "Personalien",
+    "de": "der Name, ns, n",
+    "fr": "le nom"
+  },
+  {
+    "sec": "Personalien",
+    "de": "der Vorname, ns, n",
+    "fr": "le prénom"
+  },
+  {
+    "sec": "Personalien",
+    "de": "die Liste, n",
+    "fr": "la liste"
+  },
+  {
+    "sec": "Personalien",
+    "de": "nennen",
+    "fr": "nommer, appeler",
+    "ex": "nennt, nannte, hat genannt"
+  },
+  {
+    "sec": "Personalien",
+    "de": "jemand (niemand)",
+    "fr": "quelqu'un (ne... personne)",
+    "ex": "Hat sie jemand(en) gesehen? Niemand ander(e)s war da."
+  },
+  {
+    "sec": "Personalien",
+    "de": "selbst (= selber)",
+    "fr": "(soi-)même",
+    "ex": "Du hast es selbst gesagt. Das müssen Sie selber wissen."
+  },
+  {
+    "sec": "Familie",
+    "de": "die Familie, n",
+    "fr": "la famille"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Eltern (Pl.)",
+    "fr": "les parents"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Mutter, ¨",
+    "fr": "la mère"
+  },
+  {
+    "sec": "Familie",
+    "de": "der Vater, ¨",
+    "fr": "le père"
+  },
+  {
+    "sec": "Familie",
+    "de": "das Baby, s",
+    "fr": "le bébé"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Tochter, ¨",
+    "fr": "la fille"
+  },
+  {
+    "sec": "Familie",
+    "de": "der Sohn, ¨e",
+    "fr": "le fils"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Geschwister (Pl.)",
+    "fr": "les frères et sœurs"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Schwester, n",
+    "fr": "la sœur"
+  },
+  {
+    "sec": "Familie",
+    "de": "der Bruder, ¨",
+    "fr": "le frère"
+  },
+  {
+    "sec": "Familie",
+    "de": "der Zwilling, e",
+    "fr": "le jumeau, la jumelle"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Großmutter, ¨",
+    "fr": "la grand-mère"
+  },
+  {
+    "sec": "Familie",
+    "de": "der Großvater, ¨",
+    "fr": "le grand-père"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Großeltern (Pl.)",
+    "fr": "les grands-parents"
+  },
+  {
+    "sec": "Familie",
+    "de": "der Enkel, - / die -in",
+    "fr": "le petit-fils, la petite-fille"
+  },
+  {
+    "sec": "Familie",
+    "de": "verwandt (mit + D)",
+    "fr": "parent (de)",
+    "ex": "Sie sind miteinander verwandt. Herr Lehmann ist ein entfernter Verwandter."
+  },
+  {
+    "sec": "Familie",
+    "de": "die Tante, n",
+    "fr": "la tante"
+  },
+  {
+    "sec": "Familie",
+    "de": "der Onkel, -",
+    "fr": "l'oncle"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Kusine, n (die Cousine, n)",
+    "fr": "la cousine"
+  },
+  {
+    "sec": "Familie",
+    "de": "der Vetter, n (der Cousin, s)",
+    "fr": "le cousin"
+  },
+  {
+    "sec": "Familie",
+    "de": "das Ehepaar, e",
+    "fr": "le couple (marié)"
+  },
+  {
+    "sec": "Familie",
+    "de": "heiraten (+A)",
+    "fr": "épouser, se marier (avec)",
+    "ex": "Sie hat einen Jugendfreund geheiratet. Wann haben Sie geheiratet?"
+  },
+  {
+    "sec": "Familie",
+    "de": "verheiratet (un-)",
+    "fr": "marié",
+    "ex": "Sie sind seit drei Jahren verheiratet. eine verheiratete Frau"
+  },
+  {
+    "sec": "Familie",
+    "de": "sich scheiden lassen",
+    "fr": "divorcer",
+    "ex": "lässt sich scheiden, ließ sich scheiden, hat sich scheiden lassen — Sie sind geschieden."
+  },
+  {
+    "sec": "Familie",
+    "de": "*gehen (mit + D)",
+    "fr": "sortir (avec)"
+  },
+  {
+    "sec": "Familie",
+    "de": "erziehen",
+    "fr": "éduquer, élever",
+    "ex": "erzieht, erzog, hat erzogen"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Erziehung, en",
+    "fr": "l'éducation"
+  },
+  {
+    "sec": "Familie",
+    "de": "die Adoption, en",
+    "fr": "l'adoption"
+  },
+  {
+    "sec": "Charakter",
+    "de": "aktiv",
+    "fr": "actif"
+  },
+  {
+    "sec": "Charakter",
+    "de": "passiv",
+    "fr": "passif"
+  },
+  {
+    "sec": "Charakter",
+    "de": "die Ruhe, /",
+    "fr": "le calme, la tranquillité, le repos",
+    "ex": "Lass mich in Ruhe! → Fiche-moi la paix !"
+  },
+  {
+    "sec": "Charakter",
+    "de": "ruhig (un-)",
+    "fr": "calme, tranquille"
+  },
+  {
+    "sec": "Charakter",
+    "de": "still",
+    "fr": "silencieux, tranquille"
+  },
+  {
+    "sec": "Charakter",
+    "de": "bescheiden (un-)",
+    "fr": "modeste"
+  },
+  {
+    "sec": "Charakter",
+    "de": "fleißig",
+    "fr": "appliqué, zélé, travailleur"
+  },
+  {
+    "sec": "Charakter",
+    "de": "faul",
+    "fr": "paresseux"
+  },
+  {
+    "sec": "Charakter",
+    "de": "die Faulheit, /",
+    "fr": "la paresse"
+  },
+  {
+    "sec": "Charakter",
+    "de": "neugierig",
+    "fr": "curieux, avide de savoir"
+  },
+  {
+    "sec": "Charakter",
+    "de": "ehrlich (un-)",
+    "fr": "honnête"
+  },
+  {
+    "sec": "Charakter",
+    "de": "ernst (un-)",
+    "fr": "sérieux, grave"
+  },
+  {
+    "sec": "Charakter",
+    "de": "stolz (auf + A)",
+    "fr": "fier (de)",
+    "ex": "Auf diese Rede wäre ich nicht stolz. → Je ne serais pas fier de ce discours."
+  },
+  {
+    "sec": "Charakter",
+    "de": "frech",
+    "fr": "insolent"
+  },
+  {
+    "sec": "Charakter",
+    "de": "die Frechheit, /",
+    "fr": "l'insolence"
+  },
+  {
+    "sec": "Charakter",
+    "de": "energisch",
+    "fr": "énergique"
+  },
+  {
+    "sec": "Charakter",
+    "de": "der Mut, /",
+    "fr": "le courage"
+  },
+  {
+    "sec": "Charakter",
+    "de": "mutig",
+    "fr": "courageux"
+  },
+  {
+    "sec": "Charakter",
+    "de": "spontan",
+    "fr": "spontané"
+  },
+  {
+    "sec": "Charakter",
+    "de": "freundlich (un-) (liebenswürdig)",
+    "fr": "aimable, amical"
+  },
+  {
+    "sec": "Charakter",
+    "de": "fröhlich",
+    "fr": "joyeux, gai"
+  },
+  {
+    "sec": "Charakter",
+    "de": "nett",
+    "fr": "gentil, aimable, charmant",
+    "ex": "Sei so nett und schließ die Tür. → Sois gentil et ferme la porte."
+  },
+  {
+    "sec": "Charakter",
+    "de": "lieb",
+    "fr": "1. cher  2. gentil"
+  },
+  {
+    "sec": "Charakter",
+    "de": "brav",
+    "fr": "gentil, sage"
+  },
+  {
+    "sec": "Charakter",
+    "de": "toll (ugs.)",
+    "fr": "sensationnel, génial"
+  },
+  {
+    "sec": "Charakter",
+    "de": "naiv",
+    "fr": "naïf"
+  },
+  {
+    "sec": "Charakter",
+    "de": "egoistisch",
+    "fr": "égoïste"
+  },
+  {
+    "sec": "Charakter",
+    "de": "streng",
+    "fr": "sévère, strict"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "die Reaktion, en",
+    "fr": "la réaction"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "reagieren (auf + A)",
+    "fr": "réagir (à)",
+    "ex": "Ich habe noch nicht auf den Brief reagiert. → Je n'ai pas encore réagi à la lettre."
+  },
+  {
+    "sec": "Verhalten",
+    "de": "diskret (in-)",
+    "fr": "discret"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "höflich (un-)",
+    "fr": "poli"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "herzlich",
+    "fr": "cordial"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "gehorchen (+ D)",
+    "fr": "obéir (à)"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "gehorsam (un-)",
+    "fr": "obéissant"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "heimlich",
+    "fr": "secret, en cachette, en secret"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "grob",
+    "fr": "grossier"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "grotesk",
+    "fr": "grotesque"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "wagen",
+    "fr": "oser, risquer",
+    "ex": "Ich wage nicht zu antworten. → Je n'ose pas répondre."
+  },
+  {
+    "sec": "Verhalten",
+    "de": "übertreiben",
+    "fr": "exagérer",
+    "ex": "übertreibt, übertrieb, hat übertrieben"
+  },
+  {
+    "sec": "Verhalten",
+    "de": "die Übertreibung, en",
+    "fr": "l'exagération"
+  },
+  {
+    "sec": "Wollen",
+    "de": "wollen",
+    "fr": "vouloir",
+    "ex": "will, wollte, hat gewollt — Das habe ich nicht gewollt. → Je n'ai pas voulu cela."
+  },
+  {
+    "sec": "Wollen",
+    "de": "wünschen",
+    "fr": "souhaiter, désirer",
+    "ex": "Ich wünsche dir Glück. → Je te souhaite bonne chance."
+  },
+  {
+    "sec": "Wollen",
+    "de": "der Wunsch, ¨e",
+    "fr": "le désir, le vœu, le souhait"
+  },
+  {
+    "sec": "Wollen",
+    "de": "das Projekt, e",
+    "fr": "le projet"
+  },
+  {
+    "sec": "Wollen",
+    "de": "der Plan, ¨e",
+    "fr": "le plan, le projet"
+  },
+  {
+    "sec": "Wollen",
+    "de": "planen",
+    "fr": "projeter, planifier"
+  },
+  {
+    "sec": "Wollen",
+    "de": "die Planung, en",
+    "fr": "la planification"
+  },
+  {
+    "sec": "Wollen",
+    "de": "bereit",
+    "fr": "prêt"
+  },
+  {
+    "sec": "Wollen",
+    "de": "beschließen",
+    "fr": "décider",
+    "ex": "beschließt, beschloss, hat beschlossen"
+  },
+  {
+    "sec": "Wollen",
+    "de": "das Ziel, e",
+    "fr": "le but, l'arrivée",
+    "ex": "ans Ziel kommen, am Ziel sein / sich (D) ein Ziel setzen → toucher au but, être arrivé / se fixer un but"
+  },
+  {
+    "sec": "Handeln",
+    "de": "finden",
+    "fr": "trouver",
+    "ex": "findet, fand, hat gefunden"
+  },
+  {
+    "sec": "Handeln",
+    "de": "machen",
+    "fr": "faire, rendre (+ adj.)",
+    "ex": "Das macht ihn stolz. → Ça le rend fier."
+  },
+  {
+    "sec": "Handeln",
+    "de": "tun",
+    "fr": "faire",
+    "ex": "tut, tat, hat getan"
+  },
+  {
+    "sec": "Handeln",
+    "de": "(sich) beschäftigen (mit + D)",
+    "fr": "(s')occuper (de)"
+  },
+  {
+    "sec": "Handeln",
+    "de": "sorgen (für + A)",
+    "fr": "prendre soin de, pourvoir (à), s'occuper (de)"
+  },
+  {
+    "sec": "Handeln",
+    "de": "sich kümmern (um + A)",
+    "fr": "se soucier, s'occuper (de)",
+    "ex": "Kümmere dich um deine Sachen. → Mêle-toi de tes affaires."
+  },
+  {
+    "sec": "Handeln",
+    "de": "lassen",
+    "fr": "laisser, faire (faire qc)",
+    "ex": "lässt, ließ, hat gelassen"
+  },
+  {
+    "sec": "Handeln",
+    "de": "(sich) vor/bereiten (auf + A)",
+    "fr": "(se) préparer (à)"
+  },
+  {
+    "sec": "Handeln",
+    "de": "die Vorbereitung, en",
+    "fr": "la préparation"
+  },
+  {
+    "sec": "Handeln",
+    "de": "versuchen (probieren)",
+    "fr": "1. essayer, tenter  2. goûter"
+  },
+  {
+    "sec": "Handeln",
+    "de": "der Versuch, e",
+    "fr": "l'essai, la tentative"
+  },
+  {
+    "sec": "Handeln",
+    "de": "fertig (un-)",
+    "fr": "prêt, fini, achevé"
+  },
+  {
+    "sec": "Handeln",
+    "de": "schaffen (+ A) (ugs.)",
+    "fr": "réussir, parvenir (à), travailler",
+    "ex": "Geschafft! Ich habe es geschafft. → Ça y est ! J'ai réussi."
+  },
+  {
+    "sec": "Handeln",
+    "de": "erreichen (+ A)",
+    "fr": "atteindre, parvenir (à)"
+  },
+  {
+    "sec": "Handeln",
+    "de": "verzichten (auf + A)",
+    "fr": "renoncer (à)",
+    "ex": "Er muss dieses Jahr auf die Ferien verzichten."
+  },
+  {
+    "sec": "Handeln",
+    "de": "die Schwierigkeit, en",
+    "fr": "la difficulté"
+  },
+  {
+    "sec": "Handeln",
+    "de": "schwierig",
+    "fr": "difficile"
+  },
+  {
+    "sec": "Handeln",
+    "de": "die Methode, n",
+    "fr": "la méthode"
+  },
+  {
+    "sec": "Handeln",
+    "de": "(sich) ein/setzen (sich engagieren) (für + A)",
+    "fr": "(s')engager (pour)"
+  },
+  {
+    "sec": "Handeln",
+    "de": "sorgfältig",
+    "fr": "soigneux, soigneusement"
+  },
+  {
+    "sec": "Handeln",
+    "de": "verwirklichen (realisieren)",
+    "fr": "réaliser",
+    "ex": "eine Absicht verwirklichen → réaliser une intention"
+  },
+  {
+    "sec": "Handeln",
+    "de": "nehmen",
+    "fr": "prendre",
+    "ex": "nimmt, nahm, hat genommen"
+  },
+  {
+    "sec": "Handeln",
+    "de": "halten",
+    "fr": "tenir",
+    "ex": "hält, hielt, hat gehalten"
+  },
+  {
+    "sec": "Handeln",
+    "de": "ziehen",
+    "fr": "tirer",
+    "ex": "zieht, zog, hat gezogen"
+  },
+  {
+    "sec": "Handeln",
+    "de": "werfen",
+    "fr": "jeter, lancer",
+    "ex": "wirft, warf, hat geworfen"
+  },
+  {
+    "sec": "Handeln",
+    "de": "tragen",
+    "fr": "porter",
+    "ex": "trägt, trug, hat getragen"
+  },
+  {
+    "sec": "Handeln",
+    "de": "trennen (von + D)",
+    "fr": "séparer (de)"
+  },
+  {
+    "sec": "Handeln",
+    "de": "verstecken (+ prép. sans dépl.)",
+    "fr": "cacher",
+    "ex": "Er versteckte das Geld unter dem Bett. → Il cacha l'argent sous le lit."
+  }
+]

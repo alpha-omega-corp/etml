@@ -1,0 +1,57 @@
+@use '../abstracts' as *;
+
+.accent-picker {
+    display: grid;
+    gap: space(1);
+    min-width: rem(160);
+}
+
+.accent-picker__option {
+    @include focus-visible(-2px);
+
+    display: flex;
+    gap: space(3);
+    align-items: center;
+    width: 100%;
+    padding: space(2) space(3);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    text-align: start;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-md);
+    transition: background-color $duration-fast $ease-out;
+
+    &:hover {
+        background-color: var(--color-surface-muted);
+    }
+
+    &[aria-checked='true'] {
+        background-color: var(--color-surface-muted);
+    }
+}
+
+// The swatch carries the palette's own colour, not the active accent, so the
+// four options read as a palette even while three of them are inactive.
+.accent-picker__swatch {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: rem(20);
+    height: rem(20);
+    color: #fff;
+    background-color: var(--swatch);
+    border: 1px solid rgb(28 26 23 / 15%);
+    border-radius: var(--radius-full);
+
+    svg {
+        opacity: 0;
+        transition: opacity $duration-fast $ease-out;
+    }
+
+    [aria-checked='true'] & svg {
+        opacity: 1;
+    }
+}

@@ -1,0 +1,106 @@
+@use '../abstracts' as *;
+
+// Built on <dialog>, so focus trapping, Esc-to-close and the top layer are the
+// browser's job rather than ours.
+.modal {
+    width: min(100% - #{space(8)}, var(--modal-width, #{rem(520)}));
+    max-height: calc(100dvh - #{space(16)});
+    padding: 0;
+    color: var(--color-text);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+
+    &::backdrop {
+        background-color: var(--color-overlay);
+        backdrop-filter: blur(2px);
+    }
+
+    &[open] {
+        display: flex;
+        flex-direction: column;
+
+        @include motion-safe {
+            animation: modal-in $duration-base $ease-out;
+
+            &::backdrop {
+                animation: backdrop-in $duration-base $ease-out;
+            }
+        }
+    }
+}
+
+.modal--wide {
+    --modal-width: #{rem(760)};
+}
+
+.modal__header {
+    display: flex;
+    gap: space(4);
+    align-items: flex-start;
+    padding: space(5) space(6);
+    border-block-end: 1px solid var(--color-border);
+}
+
+.modal__title {
+    font-size: var(--text-lg);
+}
+
+.modal__description {
+    margin-block-start: space(1);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.modal__close {
+    @include focus-visible;
+
+    flex-shrink: 0;
+    margin-inline-start: auto;
+    padding: space(1);
+    color: var(--color-text-muted);
+    border-radius: var(--radius-md);
+
+    &:hover {
+        color: var(--color-text);
+        background-color: var(--color-surface-muted);
+    }
+
+    svg {
+        width: rem(18);
+        height: rem(18);
+    }
+}
+
+.modal__body {
+    flex: 1;
+    padding: space(6);
+    overflow-y: auto;
+}
+
+.modal__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(3);
+    justify-content: flex-end;
+    padding: space(4) space(6);
+    background-color: var(--color-surface-muted);
+    border-block-start: 1px solid var(--color-border);
+    border-end-start-radius: var(--radius-xl);
+    border-end-end-radius: var(--radius-xl);
+}
+
+@keyframes modal-in {
+    from {
+        opacity: 0;
+        scale: 0.97;
+        translate: 0 #{rem(8)};
+    }
+}
+
+@keyframes backdrop-in {
+    from {
+        opacity: 0;
+    }
+}

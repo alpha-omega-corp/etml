@@ -1,0 +1,36 @@
+@use '../abstracts' as *;
+
+.breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(2);
+    align-items: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.breadcrumbs__item {
+    display: inline-flex;
+    gap: space(2);
+    align-items: center;
+
+    + .breadcrumbs__item::before {
+        color: var(--color-text-subtle);
+        content: '/';
+    }
+}
+
+.breadcrumbs__link {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+        color: var(--color-text);
+        text-decoration: underline;
+    }
+}
+
+.breadcrumbs__current {
+    font-weight: 500;
+    color: var(--color-text);
+}
