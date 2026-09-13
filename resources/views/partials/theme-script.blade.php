@@ -19,8 +19,9 @@
                 document.documentElement.dataset.accent = accent;
             }
         } catch (e) {
-            // Site data blocked. The `prefers-color-scheme` fallback and the
-            // default accent still apply.
+            // Site data blocked. Nothing is stamped on <html>, which is
+            // exactly the dark default the bare `:root` block paints, and the
+            // default accent still applies.
         }
     })();
 </script>

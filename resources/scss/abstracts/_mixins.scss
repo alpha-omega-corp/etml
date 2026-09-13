@@ -81,16 +81,207 @@
     }
 }
 
-/// Target only the dark theme. Handles both the explicit `data-theme` opt-in
-/// and the system preference, so callers never repeat the guard.
+/// Target only the dark theme. Dark is the default, so this is everything that
+/// has not explicitly opted out — the exact mirror of the bare `:root` block in
+/// base/_root.scss. The two must stay in step or a component's dark branch and
+/// the palette it is drawn on will disagree.
 @mixin dark {
-    :root[data-theme='dark'] & {
+    :root:not([data-theme='light']) & {
         @content;
     }
+}
 
-    @media (prefers-color-scheme: dark) {
-        :root:not([data-theme='light']) & {
-            @content;
+/// The mirror, for the rare case where light needs its own treatment.
+@mixin light {
+    :root[data-theme='light'] & {
+        @content;
+    }
+}
+
+/// Frosted-glass surface, WITHOUT the backdrop filter.
+///
+/// The edge is drawn entirely from box-shadow (`--glass-edges` opens with an
+/// `inset 0 0 0 1px` ring) and `border` is zeroed, so the ambient hairline and
+/// the directional strokes share one radius and stay concentric at
+/// --radius-2xl. A real `border` plus inset strokes would double every edge and
+/// visibly kink at the corners.
+///
+/// Sets `--surface-shadow` so focus-glow() can re-state the resting stack
+/// instead of erasing it. Callers that change elevation on hover or on
+/// `[aria-pressed]` must swap `--surface-shadow`, never `box-shadow`.
+///
+/// NEVER call on: .flashcard, .deck__stage, .deck, .deck-shell, .content,
+/// .dropdown, .toast-region, .accent-picker, .deck__decide.
+@mixin glass-surface(
+    $radius: var(--radius-xl),
+    $bg: var(--glass-panel-bg),
+    $edges: var(--glass-edges),
+    $shadow: var(--glass-shadow),
+    $sheen: true
+) {
+    --surface-shadow: #{$edges}, #{$shadow};
+
+    background-color: #{$bg};
+    background-repeat: no-repeat;
+    border: 0;
+    border-radius: #{$radius};
+    box-shadow: var(--surface-shadow);
+
+    @if $sheen {
+        background-image: var(--glass-sheen);
+    }
+}
+
+/// Adds the backdrop filter. Call ONLY on surfaces that genuinely have
+/// scrolling content behind them: .deck-bar, .deck__actions (below lg),
+/// .dropdown__menu, .toast, .modal, .modal::backdrop, .site-header.
+///
+/// Blurring a static gradient returns the same gradient — a visual no-op that
+/// costs a compositor layer and a per-frame backdrop re-sample. Every other
+/// surface in this design uses glass-surface() alone.
+///
+/// backdrop-filter creates a containing block for fixed/absolute descendants
+/// and a new stacking context. Never call this on an ANCESTOR of
+/// .deck__actions, .toast-region, .subnav or .nav-backdrop, and never inside
+/// the `.deck__stage { perspective: 1400px }` subtree.
+///
+/// There is no autoprefixer in this build, so `-webkit-` is written by hand.
+@mixin glass-frost($blur: var(--glass-blur), $fallback: var(--color-surface-raised)) {
+    -webkit-backdrop-filter: blur(#{$blur}) saturate(var(--glass-saturate));
+    backdrop-filter: blur(#{$blur}) saturate(var(--glass-saturate));
+
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        background-color: #{$fallback};
+    }
+}
+
+/// A surface pressed INTO its parent — the exact inverse of glass-surface().
+/// Emits background, radius and the inset stack only: no border, so it can be
+/// dropped into an existing rule without disturbing its box or its corners.
+@mixin glass-well($radius: var(--radius-full)) {
+    background-color: var(--glass-inset-bg);
+    border: 0;
+    border-radius: #{$radius};
+    box-shadow: var(--glass-well);
+}
+
+/// The shared micro-interaction.
+///
+/// Uses the standalone `scale:` and `translate:` properties, NEVER `transform`.
+/// This is not a style preference: `transform` on .flashcard is owned outright
+/// by `.is-flipped { transform: rotateY(180deg) }` and, for 660ms during a
+/// shuffle and 620ms during a decision, by Web Animations keyframes that
+/// override every CSS declaration (`!important` included) while they run.
+/// `scale` and `translate` are applied BEFORE `transform` in the transform
+/// chain, so they compose with all of it instead of being clobbered mid-flight
+/// and snapping on cancel. The codebase already establishes this idiom with
+/// comments at .shuffle-fx__icon and .burst__bit.
+///
+/// Hover is gated on `(hover: hover) and (pointer: fine)`: on iOS and Android
+/// `:hover` latches after a tap and does not clear until the user taps
+/// elsewhere, which would leave the flashcard — tapped twice per word —
+/// permanently enlarged.
+///
+/// The colour-only transition sits OUTSIDE motion-safe so reduced-motion users
+/// still get a correct instant hover colour; only the size change is gated,
+/// because the global reduced-motion clamp in base/_reset.scss shortens
+/// duration but does not remove a resting-vs-hover size difference.
+///
+/// Opt-IN per selector. Never apply through a broad `button, a.btn` rule.
+@mixin interactive($hover: 1.02, $press: 0.96, $lift: 0) {
+    transition:
+        background-color v.$duration-fast v.$ease-out,
+        border-color v.$duration-fast v.$ease-out,
+        color v.$duration-fast v.$ease-out,
+        box-shadow v.$duration-base v.$ease-out;
+
+    @include motion-safe {
+        transition:
+            background-color v.$duration-fast v.$ease-out,
+            border-color v.$duration-fast v.$ease-out,
+            color v.$duration-fast v.$ease-out,
+            box-shadow v.$duration-base v.$ease-out,
+            scale v.$duration-base v.$ease-out,
+            translate v.$duration-base v.$ease-out;
+
+        @media (hover: hover) and (pointer: fine) {
+            &:hover {
+                scale: #{$hover};
+                translate: 0 #{$lift};
+            }
         }
+
+        // Asymmetric on purpose: a key goes down fast and eases back slowly.
+        &:active {
+            scale: #{$press};
+            translate: 0 0;
+            transition-duration: v.$duration-fast;
+        }
+    }
+}
+
+/// Keyboard focus. focus-ring() stays the single source of truth — the outline
+/// is emitted first and is never removed, because `outline` survives
+/// forced-colors mode and a box-shadow does not (WCAG 2.2 SC 2.4.11/2.4.13).
+/// The halo is layered UNDER it, and `--surface-shadow` re-states the element's
+/// resting elevation so focusing a tile never deletes its lit edge.
+/// `--surface-shadow` defaults to `--shadow-none` in :root, so the list is
+/// always valid even on elements that carry no shadow.
+@mixin focus-glow($offset: 2px) {
+    @include focus-ring($offset);
+
+    // Composed here rather than read from a finished `--focus-halo` token so
+    // that `--halo-color` resolves against the FOCUSED element: an input with
+    // `[aria-invalid]` sets it to danger and gets a red halo, which a halo
+    // pre-substituted on `:root` could never deliver.
+    box-shadow:
+        0 0 0 4px color-mix(in oklab, var(--halo-color) var(--halo-ring), transparent),
+        0 0 var(--halo-blur) -2px color-mix(in oklab, var(--halo-color) var(--halo-glow), transparent),
+        var(--surface-shadow);
+}
+
+@mixin focus-glow-visible($offset: 2px) {
+    &:focus-visible {
+        @include focus-glow($offset);
+    }
+}
+
+/// Raise a control to the 44px floor on touch input.
+///
+/// Gated on INPUT CAPABILITY, not viewport width. A width query at `md` or `lg`
+/// misses iPad portrait (exactly 1024px) and every touch laptop, while wrongly
+/// enlarging a narrow desktop window. pages/_deck.scss already establishes
+/// `@media (hover: none)` in this codebase for the same reason.
+///
+/// Pass `$square: true` for icon buttons — `flex: none` is required alongside,
+/// because `aspect-ratio: 1` and a min-inline-size fight inside a compressing
+/// flex row.
+@mixin tap-target($square: false, $size: var(--tap-target)) {
+    @media (hover: none), (pointer: coarse) {
+        min-block-size: #{$size};
+
+        @if $square {
+            min-inline-size: #{$size};
+            flex: none;
+        }
+    }
+}
+
+/// Animate an element the JS has just revealed.
+///
+/// Deliberately an `animation`, never a transition: everything on this page is
+/// shown by clearing the `hidden` attribute or by `:empty` ceasing to match,
+/// and `[hidden] { display: none !important }` in base/_reset.scss cannot be
+/// transitioned — the `!important` even defeats `transition-behavior:
+/// allow-discrete`. An animation replays every time the element is
+/// re-displayed, which is exactly the reveal moment.
+///
+/// The delay lives INSIDE motion-safe: the global clamp zeroes
+/// animation-duration but NOT animation-delay, so a delayed `both` fill outside
+/// this guard would leave a reduced-motion reader staring at an invisible
+/// element for the length of the delay.
+@mixin state-enter($name, $duration: v.$duration-base, $delay: 0ms) {
+    @include motion-safe {
+        animation: #{$name} $duration v.$ease-out $delay both;
     }
 }

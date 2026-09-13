@@ -34,7 +34,7 @@ class AuthController extends Controller
         Auth::login($user, remember: true);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('cards'));
+        return redirect()->intended(route('languages.index'));
     }
 
     public function logout(Request $request): RedirectResponse

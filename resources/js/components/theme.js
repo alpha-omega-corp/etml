@@ -9,8 +9,12 @@
 const STORAGE_KEY = 'theme';
 const ORDER = ['light', 'dark', 'system'];
 
+// Dark is the designed default and the CSS floor; the OS no longer decides.
+// 'system' therefore resolves to dark, which is exactly what an unstamped
+// <html> paints. Keep this in step with the bare `:root` block in
+// base/_root.scss, or the toggle's icon and aria-pressed will lie.
 function systemTheme() {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return 'dark';
 }
 
 /** The stored preference, which may be 'system'. */
@@ -79,13 +83,6 @@ export function init() {
             apply(ORDER[(ORDER.indexOf(preference()) + 1) % ORDER.length]);
         } else {
             apply(resolved() === 'dark' ? 'light' : 'dark');
-        }
-    });
-
-    // Follow the OS while the preference is 'system'.
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        if (preference() === 'system') {
-            document.querySelectorAll('[data-theme-toggle]').forEach(sync);
         }
     });
 }

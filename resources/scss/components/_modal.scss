@@ -2,21 +2,32 @@
 
 // Built on <dialog>, so focus trapping, Esc-to-close and the top layer are the
 // browser's job rather than ours.
+//
+// The dialog's own box carries no padding — every inset belongs to the header,
+// body and footer — because modal.js closes on a backdrop click by testing
+// `event.target === dialog`, which only ever matches while some of the dialog
+// itself is reachable by the pointer. Padding, an inset border or a full-bleed
+// inner wrapper here would silently stop backdrop-click-to-close working.
 .modal {
+    @include glass-surface(var(--radius-xl), var(--glass-panel-bg-strong));
+    @include glass-frost;
+
     width: min(100% - #{space(8)}, var(--modal-width, #{rem(520)}));
     max-height: calc(100dvh - #{space(16)});
     padding: 0;
     color: var(--color-text);
-    background-color: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
 
+    // The overlay keeps its own fill, so the blur is written out by hand rather
+    // than taken from glass-frost(): that mixin's `@supports` fallback would
+    // repaint the backdrop in a surface colour instead of the overlay.
     &::backdrop {
         background-color: var(--color-overlay);
-        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+        backdrop-filter: blur(var(--glass-blur-sm));
     }
 
+    // Entry only. modal.js calls dialog.close() directly and adds no class, so
+    // there is no exit hook to hang an animation on and none is designed.
     &[open] {
         display: flex;
         flex-direction: column;
@@ -54,9 +65,22 @@
 }
 
 .modal__close {
-    @include focus-visible;
+    @include interactive(1.06, 0.92);
+    @include focus-glow-visible;
 
+    // `--surface-shadow` inherits and .modal is a glass surface, so without
+    // this reset the focus halo would re-state the whole dialog's elevation on
+    // a 44px button.
+    --surface-shadow: var(--shadow-none);
+
+    display: inline-grid;
+    place-items: center;
     flex-shrink: 0;
+    align-self: flex-start;
+    // 26x26 is under the target floor on a mouse too, so the hit area grows at
+    // every breakpoint rather than only on touch.
+    min-block-size: var(--tap-target);
+    min-inline-size: var(--tap-target);
     margin-inline-start: auto;
     padding: space(1);
     color: var(--color-text-muted);
@@ -67,6 +91,7 @@
         background-color: var(--color-surface-muted);
     }
 
+    // Only the hit area grew; the glyph stays where it was.
     svg {
         width: rem(18);
         height: rem(18);
@@ -85,7 +110,7 @@
     gap: space(3);
     justify-content: flex-end;
     padding: space(4) space(6);
-    background-color: var(--color-surface-muted);
+    background-color: var(--glass-inset-bg);
     border-block-start: 1px solid var(--color-border);
     border-end-start-radius: var(--radius-xl);
     border-end-end-radius: var(--radius-xl);

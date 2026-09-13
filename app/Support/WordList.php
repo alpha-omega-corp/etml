@@ -6,15 +6,18 @@ use JsonException;
 use RuntimeException;
 
 /**
- * Turns a pasted JSON vocabulary list into card rows.
+ * Turns a pasted JSON word list into card rows, for any language.
  *
- * Two shapes are accepted. The plain one is a français → allemand map:
+ * Two shapes are accepted. The plain one is a français → langue map:
  *
  *     {"la maison": "das Haus, ¨er", "la cuisine": "die Küche, n"}
  *
- * The longer one is a list, for when an entry needs an example or a heading:
+ * The longer one is a list, for when an entry needs an example or a heading.
+ * The foreign side is keyed by the language's own code, so the same list reads
+ * the same way in German and in English:
  *
  *     [{"fr": "la maison", "de": "das Haus, ¨er", "ex": "zu Hause", "sec": "Die Wohnung"}]
+ *     [{"fr": "la maison", "en": "the house", "ex": "at home", "sec": "The flat"}]
  */
 class WordList
 {
@@ -23,11 +26,12 @@ class WordList
     private const MAX_LENGTH = 500;
 
     /**
-     * @return array<int, array{section: string|null, de: string, fr: string, example: string|null}>
+     * @param  string  $code  the language's code, e.g. `de` — the key the foreign side may use
+     * @return array<int, array{section: string|null, term: string, translation: string, example: string|null}>
      *
      * @throws RuntimeException with a message meant for the user
      */
-    public static function parse(string $json): array
+    public static function parse(string $json, string $code = 'de'): array
     {
         $json = trim($json);
 
@@ -42,11 +46,11 @@ class WordList
         }
 
         if (! is_array($decoded) || $decoded === []) {
-            throw new RuntimeException('Le JSON doit être un objet « français → allemand » ou une liste d\'entrées.');
+            throw new RuntimeException('Le JSON doit être un objet « français → langue » ou une liste d\'entrées.');
         }
 
         $rows = array_is_list($decoded)
-            ? self::fromList($decoded)
+            ? self::fromList($decoded, $code)
             : self::fromMap($decoded);
 
         if ($rows === []) {
@@ -68,12 +72,12 @@ class WordList
     {
         $rows = [];
 
-        foreach ($decoded as $fr => $de) {
-            if (! is_string($de)) {
-                throw new RuntimeException("La valeur de « {$fr} » doit être une chaîne (l'allemand).");
+        foreach ($decoded as $translation => $term) {
+            if (! is_string($term)) {
+                throw new RuntimeException("La valeur de « {$translation} » doit être une chaîne (le mot étranger).");
             }
 
-            $row = self::row((string) $fr, $de, null, null);
+            $row = self::row((string) $translation, $term, null, null);
 
             if ($row !== null) {
                 $rows[] = $row;
@@ -87,23 +91,23 @@ class WordList
      * @param  array<int, mixed>  $decoded
      * @return array<int, array<string, string|null>>
      */
-    private static function fromList(array $decoded): array
+    private static function fromList(array $decoded, string $code): array
     {
         $rows = [];
 
         foreach ($decoded as $i => $entry) {
             if (! is_array($entry)) {
-                throw new RuntimeException('Entrée '.($i + 1).' : un objet {"fr": …, "de": …} est attendu.');
+                throw new RuntimeException('Entrée '.($i + 1).' : un objet {"fr": …, "'.$code.'": …} est attendu.');
             }
 
-            $fr = $entry['fr'] ?? $entry['french'] ?? $entry['français'] ?? null;
-            $de = $entry['de'] ?? $entry['german'] ?? $entry['allemand'] ?? null;
+            $translation = $entry['fr'] ?? $entry['french'] ?? $entry['français'] ?? $entry['translation'] ?? null;
+            $term = $entry[$code] ?? $entry['term'] ?? $entry['mot'] ?? null;
 
-            if (! is_string($fr) || ! is_string($de)) {
-                throw new RuntimeException('Entrée '.($i + 1).' : « fr » et « de » sont obligatoires.');
+            if (! is_string($translation) || ! is_string($term)) {
+                throw new RuntimeException('Entrée '.($i + 1).' : « fr » et « '.$code.' » sont obligatoires.');
             }
 
-            $row = self::row($fr, $de, $entry['ex'] ?? $entry['example'] ?? null, $entry['sec'] ?? $entry['section'] ?? null);
+            $row = self::row($translation, $term, $entry['ex'] ?? $entry['example'] ?? null, $entry['sec'] ?? $entry['section'] ?? null);
 
             if ($row !== null) {
                 $rows[] = $row;
@@ -116,24 +120,24 @@ class WordList
     /**
      * @return array<string, string|null>|null
      */
-    private static function row(string $fr, string $de, mixed $example, mixed $section): ?array
+    private static function row(string $translation, string $term, mixed $example, mixed $section): ?array
     {
-        $fr = trim($fr);
-        $de = trim($de);
+        $translation = trim($translation);
+        $term = trim($term);
 
-        if ($fr === '' || $de === '') {
+        if ($translation === '' || $term === '') {
             return null;
         }
 
-        foreach ([$fr, $de] as $side) {
+        foreach ([$translation, $term] as $side) {
             if (mb_strlen($side) > self::MAX_LENGTH) {
                 throw new RuntimeException('Une entrée dépasse '.self::MAX_LENGTH.' caractères.');
             }
         }
 
         return [
-            'fr' => $fr,
-            'de' => $de,
+            'translation' => $translation,
+            'term' => $term,
             'example' => self::clean($example),
             'section' => self::clean($section),
         ];

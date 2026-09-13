@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Branch;
 use App\Models\Card;
 use App\Models\CardState;
-use App\Models\Chapter;
+use App\Models\Language;
+use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -27,9 +27,14 @@ class AdminTest extends TestCase
         $this->post('/admin', ['password' => 'ouvre-toi'])->assertRedirect('/');
     }
 
-    private function german(): Chapter
+    private function german(): Unit
     {
-        return Branch::where('slug', 'allemand')->firstOrFail()->chapters()->firstOrFail();
+        return Language::where('slug', 'allemand')->firstOrFail()->units()->firstOrFail();
+    }
+
+    private function deckUrl(Unit $unit): string
+    {
+        return route('deck.show', [$unit->language, $unit->kind->slug(), $unit], absolute: false);
     }
 
     // --- entering the mode ----------------------------------------------------
@@ -112,65 +117,67 @@ class AdminTest extends TestCase
         $this->post('/admin', ['password' => 'ouvre-toi'])->assertRedirect('/login');
     }
 
-    // --- deleting chapters ----------------------------------------------------
+    // --- deleting units --------------------------------------------------------
 
     public function test_the_delete_control_is_only_rendered_for_an_administrator(): void
     {
-        $this->get('/')->assertOk()->assertDontSee('Supprimer «', false);
+        $url = $this->deckUrl($this->german());
+
+        $this->get($url)->assertOk()->assertDontSee('Supprimer «', false);
 
         $this->beAdmin();
 
-        $this->get('/')->assertOk()->assertSee('Supprimer «', false);
+        $this->get($url)->assertOk()->assertSee('Supprimer «', false);
     }
 
-    public function test_an_administrator_deletes_a_chapter_and_everything_under_it(): void
+    public function test_an_administrator_deletes_a_unit_and_everything_under_it(): void
     {
-        $chapter = $this->german();
-        $card = $chapter->cards()->firstOrFail();
+        $unit = $this->german();
+        $card = $unit->cards()->firstOrFail();
         $this->postJson("/cards/{$card->id}/status", ['status' => 'known'])->assertOk();
         $this->assertSame(1, CardState::count());
 
         $this->beAdmin();
 
-        $this->delete("/chapters/{$chapter->id}")
-            ->assertRedirect('/')
+        $this->delete("/units/{$unit->id}")
+            ->assertRedirect('/allemand')
             ->assertSessionHas('success');
 
-        $this->assertNull(Chapter::find($chapter->id));
-        $this->assertSame(0, Card::where('chapter_id', $chapter->id)->count());
+        $this->assertNull(Unit::find($unit->id));
+        $this->assertSame(0, Card::where('unit_id', $unit->id)->count());
         $this->assertSame(0, CardState::count());
     }
 
-    public function test_deleting_the_open_chapter_clears_the_selection(): void
+    public function test_deleting_the_open_unit_clears_the_selection(): void
     {
-        $chapter = $this->german();
-        $this->get("/chapters/{$chapter->id}");
-        $this->assertSame($chapter->id, session('chapter_id'));
+        $unit = $this->german();
+        $this->get($this->deckUrl($unit));
+        $this->assertSame($unit->id, session('unit_id'));
 
         $this->beAdmin();
-        $this->delete("/chapters/{$chapter->id}");
+        $this->delete("/units/{$unit->id}");
 
-        $this->assertNotSame($chapter->id, session('chapter_id'));
-        $this->get('/')->assertOk();
+        $this->assertNotSame($unit->id, session('unit_id'));
+        $this->get('/allemand')->assertOk();
     }
 
-    public function test_a_plain_user_cannot_delete_a_chapter(): void
+    public function test_a_plain_user_cannot_delete_a_unit(): void
     {
-        $chapter = $this->german();
+        $unit = $this->german();
 
-        $this->delete("/chapters/{$chapter->id}")->assertForbidden();
+        $this->delete("/units/{$unit->id}")->assertForbidden();
 
-        $this->assertNotNull(Chapter::find($chapter->id));
+        $this->assertNotNull(Unit::find($unit->id));
     }
 
-    public function test_a_guest_cannot_delete_a_chapter(): void
+    public function test_a_guest_cannot_delete_a_unit(): void
     {
-        $chapter = $this->german();
+        $unit = $this->german();
         $this->post('/logout');
 
-        $this->delete("/chapters/{$chapter->id}")->assertRedirect('/login');
+        $this->delete("/units/{$unit->id}")->assertRedirect('/login');
 
-        $this->assertNotNull(Chapter::find($chapter->id));
+        $this->assertNotNull(Unit::find($unit->id));
     }
 
     // --- staying signed in ----------------------------------------------------

@@ -30,7 +30,7 @@
     </div>
 
     <button type="button" class="toast__dismiss" data-toast-dismiss>
-        <span class="visually-hidden">Dismiss</span>
+        <span class="visually-hidden">Fermer</span>
         <x-ui.icon name="x" />
     </button>
 </div>

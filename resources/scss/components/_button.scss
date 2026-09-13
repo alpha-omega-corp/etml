@@ -3,8 +3,14 @@
 // Local custom properties are the variant API: a modifier only needs to swap
 // `--btn-*` values rather than restate the whole rule. Hover has its own three
 // tokens so a variant can redirect its hover without a nested `&:hover` block.
+//
+// `interactive()` carries the transition list, so nothing in this rule may
+// declare `transition` again: a later declaration would override the mixin's
+// list outright and the scale would never ease.
 .btn {
-    @include focus-visible;
+    @include focus-glow-visible;
+    @include interactive(1.02, 0.96);
+    @include tap-target;
 
     --btn-bg: var(--color-surface);
     --btn-fg: var(--color-text);
@@ -13,6 +19,11 @@
     --btn-fg-hover: var(--color-accent);
     --btn-border-hover: var(--color-accent);
     --btn-shadow: var(--shadow-xs);
+
+    // Focus layers its halo UNDER the button's own elevation instead of
+    // replacing it: focus-glow() re-states `--surface-shadow`, so a variant
+    // that swaps `--btn-shadow` keeps its shadow while focused.
+    --surface-shadow: var(--btn-shadow);
 
     display: inline-flex;
     gap: space(2);
@@ -30,11 +41,6 @@
     border: 1px solid var(--btn-border);
     border-radius: var(--radius-md);
     box-shadow: var(--btn-shadow);
-    transition:
-        background-color $duration-fast $ease-out,
-        border-color $duration-fast $ease-out,
-        color $duration-fast $ease-out,
-        transform $duration-fast $ease-out;
 
     &:hover {
         color: var(--btn-fg-hover);
@@ -42,14 +48,15 @@
         border-color: var(--btn-border-hover);
     }
 
-    &:active {
-        transform: translateY(1px);
-    }
-
     &:disabled,
     &[aria-disabled='true'] {
         pointer-events: none;
         opacity: 0.55;
+
+        // Pointer events are off, so no state can fire from here on — but a
+        // button disabled mid-hover would otherwise stay scaled up.
+        scale: 1;
+        translate: 0 0;
     }
 
     svg {
@@ -73,10 +80,10 @@
 
 .btn--danger {
     --btn-bg: var(--color-danger);
-    --btn-fg: #fff;
+    --btn-fg: var(--color-danger-contrast);
     --btn-border: var(--color-danger);
     --btn-bg-hover: color-mix(in oklab, var(--color-danger) 85%, black);
-    --btn-fg-hover: #fff;
+    --btn-fg-hover: var(--color-danger-contrast);
     --btn-border-hover: color-mix(in oklab, var(--color-danger) 85%, black);
 }
 
@@ -87,7 +94,11 @@
     --btn-bg-hover: var(--color-surface-muted);
     --btn-fg-hover: var(--color-text);
     --btn-border-hover: transparent;
-    --btn-shadow: none;
+
+    // A zero-alpha shadow rather than `none`: `--btn-shadow` now feeds
+    // `--surface-shadow`, and `none` cannot sit inside the comma-separated
+    // list focus-glow() emits.
+    --btn-shadow: var(--shadow-none);
 }
 
 .btn--link {
@@ -97,14 +108,17 @@
     --btn-fg: var(--color-accent);
     --btn-fg-hover: var(--color-accent-hover);
     --btn-border-hover: transparent;
-    --btn-shadow: none;
+    --btn-shadow: var(--shadow-none);
 
     padding-inline: 0;
     text-decoration: underline;
     text-underline-offset: 0.2em;
 
+    // The opt-out has to name the same properties `interactive()` sets;
+    // `transform: none` would no longer undo anything.
     &:active {
-        transform: none;
+        scale: 1;
+        translate: 0 0;
     }
 }
 
@@ -126,7 +140,11 @@
     width: 100%;
 }
 
+// The default dropdown trigger, the accent-picker trigger and the theme
+// toggle are all this button, which makes 34x34 the app's most-tapped miss.
 .btn--icon {
+    @include tap-target(true);
+
     padding: space(2);
     aspect-ratio: 1;
 }
@@ -162,6 +180,15 @@
 
         + .btn {
             margin-inline-start: -1px;
+        }
+
+        // The group collapses its doubled seam with a -1px margin and squares
+        // its middle corners; a scaled segment opens a visible gap on both
+        // sides and rounds a corner that is meant to stay square.
+        &:hover,
+        &:active {
+            scale: 1;
+            translate: 0 0;
         }
 
         &:hover,

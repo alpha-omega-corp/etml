@@ -52,6 +52,11 @@ fieldset.field {
 .input,
 .textarea,
 .select {
+    // Focus stacks its halo on top of this rather than replacing it:
+    // focus-glow() re-states `--surface-shadow` underneath the halo. Declaring
+    // it here also stops a control inheriting the stack of a glass ancestor.
+    --surface-shadow: var(--shadow-xs);
+
     width: 100%;
     padding: space(2) space(3);
     font-size: var(--text-sm);
@@ -59,7 +64,7 @@ fieldset.field {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--surface-shadow);
     transition: border-color $duration-fast $ease-out, box-shadow $duration-fast $ease-out;
 
     &::placeholder {
@@ -70,10 +75,13 @@ fieldset.field {
         border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-border-strong));
     }
 
+    // The outline is never removed: it is what survives forced-colors mode,
+    // where box-shadow is dropped. Offset 0 sits it flush inside the 4px halo
+    // so the two read as one layered ring rather than two concentric lines.
     &:focus-visible {
+        @include focus-glow(0);
+
         border-color: var(--color-accent);
-        outline: none;
-        box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent);
     }
 
     &:disabled,
@@ -84,12 +92,13 @@ fieldset.field {
     }
 
     // Set by the Blade components whenever the field has a validation error.
+    // `--halo-color` is the retarget hook: it recolours the whole focus halo
+    // through one property. Equal specificity to `:focus-visible`, so this
+    // block has to stay below it for the red border to win.
     &[aria-invalid='true'] {
-        border-color: var(--color-danger);
+        --halo-color: var(--color-danger);
 
-        &:focus-visible {
-            box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-danger) 22%, transparent);
-        }
+        border-color: var(--color-danger);
     }
 }
 
@@ -110,6 +119,15 @@ fieldset.field {
     @include dark {
         background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="%23a49d92" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8l4 4 4-4"/></svg>');
     }
+}
+
+// The 44px touch floor. The addon is grown with the controls it sits against
+// — a shorter addon would leave a step in the input-group seam — and the
+// textarea is left out, since `field-sizing: content` owns its height.
+.input,
+.select,
+.input-group__addon {
+    @include tap-target;
 }
 
 // An input with a leading or trailing adornment (icon, unit, button).
@@ -149,6 +167,8 @@ fieldset.field {
 // Checkbox / radio -----------------------------------------------------------
 
 .choice {
+    @include tap-target;
+
     display: flex;
     gap: space(3);
     align-items: flex-start;
@@ -192,6 +212,8 @@ fieldset.field {
 
 // A switch-styled checkbox.
 .switch {
+    @include tap-target;
+
     display: flex;
     gap: space(3);
     align-items: center;

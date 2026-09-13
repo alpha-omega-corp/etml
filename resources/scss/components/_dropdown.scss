@@ -1,38 +1,55 @@
 @use '../abstracts' as *;
 
+// The positioning ancestor only, and it stays flat: a backdrop-filter here
+// would make this element the containing block for the absolutely positioned
+// menu and re-anchor it. The glass belongs on .dropdown__menu.
 .dropdown {
     position: relative;
     display: inline-flex;
 }
 
 .dropdown__menu {
+    @include glass-surface(var(--radius-lg), var(--glass-panel-bg-strong));
+    @include glass-frost(var(--glass-blur-sm));
+
     position: absolute;
     z-index: layer('dropdown');
     inset-block-start: calc(100% + #{space(2)});
     min-width: rem(190);
     padding: space(1);
-    background-color: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
 
     // Closed state. `[hidden]` in the reset removes it from the a11y tree; the
-    // transition below only runs on the way in.
+    // animation below only runs on the way in. It has to stay an animation:
+    // dropdown.js opens the menu by clearing `hidden`, and a transition can
+    // never fire against `display: none !important`.
     @include motion-safe {
         animation: dropdown-in $duration-fast $ease-out;
     }
 }
 
+// The menu grows out of the corner it is pinned to. `transform-origin` steers
+// the standalone `scale` property, not just `transform`.
 .dropdown__menu--start {
     inset-inline-start: 0;
+    transform-origin: top left;
 }
 
 .dropdown__menu--end {
     inset-inline-end: 0;
+    transform-origin: top right;
 }
 
+// A full-width row deliberately does not grow on hover: a 1.02 scale would
+// overflow the menu's space(1) padding and push the -2px inset ring outside its
+// radius. The background wash is the pointer affordance instead. The inset
+// offset on the ring exists for the same reason, which is also why this row
+// keeps focus-visible() rather than the halo — a glow would spill outside the
+// menu. interactive() brings the transition this rule used to declare for
+// itself; a second `transition` after it would override the mixin's whole list.
 .dropdown__item {
     @include focus-visible(-2px);
+    @include interactive(1, 0.98);
+    @include tap-target;
 
     display: flex;
     gap: space(2);
@@ -44,7 +61,6 @@
     text-align: start;
     text-decoration: none;
     border-radius: var(--radius-md);
-    transition: background-color $duration-fast $ease-out;
 
     &:hover {
         color: var(--color-text);
@@ -82,13 +98,17 @@
     font-size: var(--text-xs);
     font-weight: 600;
     letter-spacing: var(--tracking-wide);
-    color: var(--color-text-subtle);
+    // Muted, not subtle: `--color-text-subtle` is 4.17:1 on the bare canvas
+    // before any tint and is confined to placeholders sitting on their own
+    // opaque control fill. This label sits on glass.
+    color: var(--color-text-muted);
     text-transform: uppercase;
 }
 
 @keyframes dropdown-in {
     from {
         opacity: 0;
+        scale: 0.96;
         translate: 0 -#{rem(4)};
     }
 }

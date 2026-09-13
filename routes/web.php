@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CardController;
-use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\DeckController;
+use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\ProgramEntryController;
+use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -15,23 +18,47 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/', [CardController::class, 'index'])->name('cards');
+    Route::get('/', [LanguageController::class, 'index'])->name('languages.index');
+
     Route::post('/cards/{card}/status', [CardController::class, 'setStatus'])->name('cards.status');
     Route::post('/cards/reset', [CardController::class, 'reset'])->name('cards.reset');
 
-    Route::get('/branches/{branch}', [BranchController::class, 'show'])->name('branches.show');
-
-    Route::get('/chapters/create', [ChapterController::class, 'create'])->name('chapters.create');
-    Route::post('/chapters', [ChapterController::class, 'store'])->name('chapters.store');
-    Route::get('/chapters/{chapter}', [ChapterController::class, 'show'])->name('chapters.show');
-    Route::patch('/chapters/{chapter}', [ChapterController::class, 'update'])->name('chapters.update');
-    Route::post('/chapters/{chapter}/import', [ChapterController::class, 'import'])->name('chapters.import');
+    Route::get('/units/create', [UnitController::class, 'create'])->name('units.create');
+    Route::post('/units', [UnitController::class, 'store'])->name('units.store');
+    Route::patch('/units/{unit}', [UnitController::class, 'update'])->name('units.update');
+    Route::post('/units/{unit}/import', [UnitController::class, 'import'])->name('units.import');
 
     Route::get('/admin', [AdminController::class, 'show'])->name('admin.login');
     Route::post('/admin', [AdminController::class, 'login']);
     Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
     Route::middleware('admin')->group(function () {
-        Route::delete('/chapters/{chapter}', [ChapterController::class, 'destroy'])->name('chapters.destroy');
+        Route::delete('/units/{unit}', [UnitController::class, 'destroy'])->name('units.destroy');
+
+        // One line of a programme. Fixed first segment, so these stay clear of
+        // the `/{language}` block below.
+        Route::post('/programme/entries', [ProgramEntryController::class, 'save'])->name('entries.save');
+        Route::delete('/programme/entries/{entry}', [ProgramEntryController::class, 'destroy'])->name('entries.destroy');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Language-scoped pages
+    |--------------------------------------------------------------------------
+    |
+    | `/{language}` reads as `/allemand`, which means it would swallow any new
+    | top-level path. Routes are matched in the order they are declared, so
+    | everything with a fixed first segment MUST stay above this block — and a
+    | new one goes above it too, never below.
+    |
+    */
+    Route::get('/{language}', [ProgramController::class, 'show'])->name('program.show');
+
+    Route::middleware('admin')->group(function () {
+        Route::get('/{language}/programme', [ProgramController::class, 'edit'])->name('program.edit');
+        Route::post('/{language}/programme', [ProgramController::class, 'store'])->name('program.store');
+        Route::delete('/{language}/programme', [ProgramController::class, 'destroy'])->name('program.destroy');
+    });
+
+    Route::get('/{language}/{kind}/{unit}', [DeckController::class, 'show'])->name('deck.show');
 });

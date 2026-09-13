@@ -1,13 +1,23 @@
 @use '../abstracts' as *;
 
+// Never glassed: the picker renders inside `.dropdown__menu`, which is already
+// frosted, and a second backdrop-filter on top of the first reads muddy and
+// costs another compositor pass.
 .accent-picker {
     display: grid;
     gap: space(1);
     min-width: rem(160);
 }
 
+// No hover growth. A full-width row inside a 160px menu has nowhere to grow to:
+// a 1.02 scale overflows the menu's space(1) padding and pushes the -2px inset
+// focus ring outside its radius. The press and the background wash carry the
+// pointer affordance instead, and `interactive()` supplies the transition the
+// rule used to declare by hand.
 .accent-picker__option {
+    @include interactive(1, 0.98);
     @include focus-visible(-2px);
+    @include tap-target;
 
     display: flex;
     gap: space(3);
@@ -21,7 +31,6 @@
     background: none;
     border: 0;
     border-radius: var(--radius-md);
-    transition: background-color $duration-fast $ease-out;
 
     &:hover {
         background-color: var(--color-surface-muted);
@@ -33,7 +42,14 @@
 }
 
 // The swatch carries the palette's own colour, not the active accent, so the
-// four options read as a palette even while three of them are inactive.
+// four options read as a palette even while three of them are inactive. Both
+// literals here are deliberate and are the app's only exemption from the
+// no-hex rule: `--swatch` is set per option in the Blade because a custom
+// property for an accent that is *not* applied cannot be read back, and the
+// check is white because it must contrast with that fixed swatch rather than
+// with the theme. The ring is the one part that does follow the theme — those
+// four hexes are dark, so an ink hairline vanishes against a dark menu and the
+// chips lose their edge.
 .accent-picker__swatch {
     display: inline-flex;
     flex-shrink: 0;
@@ -43,7 +59,7 @@
     height: rem(20);
     color: #fff;
     background-color: var(--swatch);
-    border: 1px solid rgb(28 26 23 / 15%);
+    border: 1px solid var(--glass-hairline);
     border-radius: var(--radius-full);
 
     svg {

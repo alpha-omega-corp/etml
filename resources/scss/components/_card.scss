@@ -1,12 +1,10 @@
 @use '../abstracts' as *;
 
 .card {
+    @include glass-surface(var(--radius-lg));
+
     display: flex;
     flex-direction: column;
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xs);
 }
 
 .card__header,
@@ -42,7 +40,7 @@
     flex-wrap: wrap;
     gap: space(3);
     align-items: center;
-    background-color: var(--color-surface-muted);
+    background-color: var(--glass-inset-bg);
     border-block-start: 1px solid var(--color-border);
     border-end-start-radius: var(--radius-lg);
     border-end-end-radius: var(--radius-lg);
@@ -55,28 +53,42 @@
 }
 
 .card--muted {
+    // Elevation is always a `--surface-shadow` swap, never a `box-shadow`
+    // literal, so a muted card that is also interactive or focused composes
+    // with those states instead of erasing them. `--shadow-none` is a real
+    // zero shadow: the keyword `none` cannot sit in the comma-separated list
+    // focus-glow() emits.
+    --surface-shadow: var(--shadow-none);
+
     background-color: var(--color-surface-muted);
-    box-shadow: none;
 }
 
 // An entire card that behaves as one link. The card keeps semantic markup; the
 // anchor inside it is stretched over the whole surface.
 .card--interactive {
+    @include interactive(1.01, 0.995, rem(-2));
+
     position: relative;
-    transition: border-color $duration-base $ease-out, box-shadow $duration-base $ease-out,
-        transform $duration-base $ease-out;
 
+    // Raising the card swaps the shadow token rather than writing box-shadow,
+    // which would drop the lit edge glass-surface() drew and fight the focus
+    // rules below.
     &:hover {
-        border-color: var(--color-border-strong);
-        box-shadow: var(--shadow-md);
-
-        @include motion-safe {
-            transform: translateY(-2px);
-        }
+        --surface-shadow: var(--glass-edges), var(--glass-shadow-raised);
     }
 
+    // Keyboard focus is TWO cooperating rules and both halves are load-bearing.
+    // The ring is drawn on the CARD, because the stretched anchor's own would
+    // trace the link text rather than the surface, and the anchor suppresses
+    // its own below. `:focus-within` carries the ring because it matches in
+    // every browser; the additive halo is keyed to `:focus-visible` on the link
+    // instead, so it never fires on a mouse click the way `:focus-within` does.
     &:focus-within {
         @include focus-ring;
+    }
+
+    &:has(.card__link:focus-visible) {
+        @include focus-glow;
     }
 
     .card__link {

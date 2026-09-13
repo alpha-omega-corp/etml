@@ -15,14 +15,25 @@
     color: var(--color-text-muted);
 }
 
+// Wrapping is not optional here: at the 44px touch floor, ten links plus their
+// gaps overrun a 360px viewport.
 .pagination__list {
     display: flex;
+    flex-wrap: wrap;
     gap: space(1);
     align-items: center;
 }
 
+// `interactive()` owns the transition — the hand-written one this rule used to
+// carry would have replaced the mixin's list and scale would never have eased.
 .pagination__link {
-    @include focus-visible;
+    @include interactive(1.04, 0.94);
+    @include focus-glow-visible;
+
+    // A link carries no elevation of its own, and `--surface-shadow` inherits:
+    // without this reset a pagination list dropped inside a glass card would
+    // re-state that whole card's shadow stack on one focused 44px link.
+    --surface-shadow: var(--shadow-none);
 
     display: inline-grid;
     place-items: center;
@@ -35,7 +46,12 @@
     text-decoration: none;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    transition: background-color $duration-fast $ease-out, color $duration-fast $ease-out;
+
+    // Last on purpose. Sass drops this media block in at the point of the
+    // include, and `min-inline-size` cascades as one property with the
+    // `min-width` above — included any earlier, the resting 34px would win the
+    // inline axis back and the target would grow in height only.
+    @include tap-target(true);
 
     &:hover {
         color: var(--color-text);

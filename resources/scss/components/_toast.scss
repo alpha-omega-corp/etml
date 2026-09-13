@@ -1,5 +1,10 @@
 @use '../abstracts' as *;
 
+// A positioning frame, never a surface: the blur belongs on the individual
+// .toast so a stack of them does not composite one blur on top of another, and
+// nothing here may create a containing block for the fixed region itself.
+// toast.js builds this element with `className = 'toast-region'` when the page
+// ships without one.
 .toast-region {
     position: fixed;
     z-index: layer('toast');
@@ -20,6 +25,9 @@
 .toast {
     --toast-accent: var(--color-accent);
 
+    @include glass-surface(var(--radius-md), var(--glass-panel-bg-strong));
+    @include glass-frost(var(--glass-blur-sm));
+
     display: flex;
     gap: space(3);
     align-items: flex-start;
@@ -28,11 +36,9 @@
     padding: space(3) space(4);
     font-size: var(--text-sm);
     pointer-events: auto;
-    background-color: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
+    // glass-surface() zeroes `border` and draws its own hairline as an inset
+    // ring, so the variant rail is re-stated after it.
     border-inline-start: 3px solid var(--toast-accent);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
 
     @include motion-safe {
         animation: toast-in $duration-base $ease-out;
@@ -75,22 +81,37 @@
 
 .toast__dismiss {
     @include focus-visible;
+    @include interactive(1.06, 0.92);
 
+    display: inline-grid;
+    place-items: center;
     flex-shrink: 0;
+    align-self: flex-start;
+    // 22x22 is under the target floor on a mouse too, so the hit area grows at
+    // every breakpoint. It makes a one-line toast taller; that is the trade.
+    min-block-size: var(--tap-target);
+    min-inline-size: var(--tap-target);
     padding: space(1);
-    color: var(--color-text-subtle);
+    // Muted rather than subtle, because this control sits on glass rather than
+    // on an opaque fill of its own.
+    color: var(--color-text-muted);
     border-radius: var(--radius-sm);
 
     &:hover {
         color: var(--color-text);
     }
 
+    // Only the hit area grew; the glyph stays where it was.
     svg {
         width: rem(14);
         height: rem(14);
     }
 }
 
+// The app's one correct entry-and-exit pair. Both halves stay animations, and
+// the exit has a hard ceiling: toast.js races `animationend` against a
+// `setTimeout(remove, 400)`, so anything past ~350ms gets its tail chopped on a
+// slow machine only.
 .toast--leaving {
     @include motion-safe {
         animation: toast-out $duration-base $ease-in-out forwards;

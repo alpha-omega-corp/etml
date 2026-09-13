@@ -7,16 +7,28 @@
     border-block-end: 1px solid var(--color-border);
 }
 
+// The tab itself never moves. Its indicator sits at `inset-block-end: -1px` to
+// overlap the list's bottom border, so any scale or translate on the tab would
+// detach that overlap or double the rule — which is why `interactive()` is
+// deliberately absent here and all the motion lives in `::after`. The hover
+// wash squares off at the bottom for the same reason: it has to meet that
+// border flush, or the indicator stops reading as continuous with it. The
+// vertical size already clears the touch floor at ~46px; only
+// `min-inline-size` is added, for one- and two-character labels.
 .tabs__tab {
     @include focus-visible(-2px);
 
     position: relative;
+    min-inline-size: rem(44);
     padding: space(3) space(4);
     font-size: var(--text-sm);
     font-weight: 500;
     color: var(--color-text-muted);
     white-space: nowrap;
-    transition: color $duration-fast $ease-out;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    transition:
+        color $duration-fast $ease-out,
+        background-color $duration-fast $ease-out;
 
     &::after {
         position: absolute;
@@ -27,17 +39,33 @@
         background-color: transparent;
         border-radius: var(--radius-full);
         transition: background-color $duration-fast $ease-out;
+
+        // The indicator wipes out from the centre of the tab being selected.
+        // Reduced motion keeps the colour swap and drops the wipe: with no
+        // `scale: 0 1` to return from, the selected rule below has nothing
+        // left to animate.
+        @include motion-safe {
+            scale: 0 1;
+            transform-origin: center;
+            transition:
+                scale $duration-base $ease-out,
+                background-color $duration-fast $ease-out;
+        }
     }
 
     &:hover {
         color: var(--color-text);
+        background-color: var(--glass-panel-bg);
     }
 
+    // Keyed off the attribute, never a class: tabs.js sets `aria-selected`, so
+    // anything else would let the look and the a11y tree drift apart.
     &[aria-selected='true'] {
         color: var(--color-accent);
 
         &::after {
             background-color: var(--color-accent);
+            scale: 1 1;
         }
     }
 }
@@ -45,6 +73,15 @@
 .tabs__panel {
     padding-block-start: space(6);
 
+    // tabs.js toggles `hidden`, and `display: none !important` in the reset
+    // cannot be transitioned — so the reveal is an animation, which replays
+    // every time a panel comes back.
+    &:not([hidden]) {
+        @include state-enter(panel-in);
+    }
+
+    // The panel carries tabindex=0 and is focused programmatically after a
+    // switch; a ring there would read as a stray click target.
     &:focus-visible {
         outline: none;
     }

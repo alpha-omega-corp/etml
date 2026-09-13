@@ -1,0 +1,14 @@
+[
+  {"date": "2026-09-07", "test": "Vocabulaire", "chapters": ["Voc 1"], "note": "Chapitre 1.1 → 2.1"},
+  {"date": "2026-09-28", "test": "Vocabulaire", "chapters": ["Voc 2"], "note": "Chapitre 2.2 → 3.1"},
+  {"date": "2026-10-05", "test": "Verbes", "pages": ["Verben 1"]},
+  {"date": "2026-10-26", "test": "Vocabulaire", "chapters": ["Voc 3"], "note": "Chapitre 3.2 → 4.3"},
+  {"date": "2026-11-16", "test": "Vocabulaire", "chapters": ["Voc 4"], "note": "Chapitre 4.4 → 4.8"},
+  {"date": "2026-12-07", "test": "Vocabulaire", "chapters": ["Voc 5"], "note": "Chapitre 5.1 → 6.4"},
+  {"date": "2027-01-11", "test": "Vocabulaire", "chapters": ["Voc 6"], "note": "Chapitre 6.5 → 8.3"},
+  {"date": "2027-02-01", "test": "Verbes", "pages": ["Verben 2"]},
+  {"date": "2027-02-15", "test": "Vocabulaire", "chapters": ["Voc 7"], "note": "Chapitre 9.1 → 10.4"},
+  {"date": "2027-03-15", "test": "Vocabulaire", "chapters": ["Voc 8"], "note": "Chapitre 11.1 → 11.6"},
+  {"date": "2027-04-12", "test": "Vocabulaire", "chapters": ["Voc 9"], "note": "Chapitre 11.7 → 13.2"},
+  {"date": "2027-05-10", "test": "Vocabulaire", "chapters": ["Voc 10"], "note": "Chapitre 13.3 → 15.2"}
+]

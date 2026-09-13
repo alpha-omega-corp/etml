@@ -1,0 +1,171 @@
+// -----------------------------------------------------------------------------
+// Language picker
+//
+// The front door. One tile per language, each carrying what it holds, how far
+// the user has got and the next date on its programme — enough to choose from
+// without opening anything.
+// -----------------------------------------------------------------------------
+
+@use '../abstracts' as *;
+
+.picker {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: space(4);
+    width: 100%;
+    max-width: rem(760);
+    margin-inline: auto;
+    padding-inline: space(4);
+    padding-block: space(8) space(16);
+
+    @include up('md') {
+        padding-inline: space(6);
+    }
+}
+
+.picker__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    text-wrap: balance;
+}
+
+.picker__lead {
+    margin: 0 0 space(2);
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+}
+
+.picker__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: space(3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include up('sm') {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.picker__item {
+    display: flex;
+}
+
+// The tile itself. A link, so the whole card is the target.
+.lang-card {
+    display: grid;
+    gap: space(3);
+    align-content: start;
+    width: 100%;
+    padding: space(4);
+    color: inherit;
+    text-decoration: none;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+
+    @include interactive($hover: 1, $press: 0.99, $lift: 2px);
+    @include focus-visible;
+
+    &:hover {
+        border-color: var(--color-border-strong);
+    }
+
+    &.is-current {
+        border-color: var(--color-accent);
+    }
+}
+
+.lang-card__head {
+    display: flex;
+    gap: space(3);
+    align-items: center;
+}
+
+// The code is the tile's face: two letters, large, in the accent.
+.lang-card__code {
+    display: grid;
+    place-items: center;
+    width: rem(44);
+    height: rem(44);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-accent-contrast);
+    background-color: var(--color-accent);
+    border-radius: var(--radius-lg);
+}
+
+.lang-card__names {
+    display: grid;
+    gap: rem(2);
+    min-width: 0;
+}
+
+.lang-card__name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+
+    @include truncate;
+}
+
+.lang-card__label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+
+    @include truncate;
+}
+
+.lang-card__figures {
+    display: flex;
+    gap: space(5);
+}
+
+.lang-card__figure {
+    display: grid;
+    gap: rem(1);
+}
+
+.lang-card__number {
+    font-size: var(--text-xl);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--leading-tight);
+}
+
+.lang-card__unit {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+}
+
+.lang-card__progress {
+    display: block;
+    height: rem(4);
+    overflow: hidden;
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-full);
+}
+
+.lang-card__progress-fill {
+    display: block;
+    height: 100%;
+    background-color: var(--color-success);
+    border-radius: inherit;
+}
+
+.lang-card__next {
+    display: flex;
+    gap: space(2);
+    align-items: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.lang-card__next--none {
+    color: var(--color-text-subtle);
+}

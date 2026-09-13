@@ -33,7 +33,7 @@
 
     @if ($dismissible)
         <button type="button" class="alert__dismiss" data-dismiss>
-            <span class="visually-hidden">Dismiss</span>
+            <span class="visually-hidden">Fermer</span>
             <x-ui.icon name="x" />
         </button>
     @endif

@@ -17,7 +17,7 @@
                 autocomplete="current-password"
                 autofocus
                 required
-                hint="Permet de supprimer des chapitres."
+                hint="Permet de modifier le programme et de supprimer des chapitres."
             />
 
             <x-ui.button type="submit" variant="primary" size="lg" block icon="lock">
@@ -26,7 +26,7 @@
         </form>
 
         <p class="mt-4 text-muted" style="font-size: var(--text-sm)">
-            <a href="{{ route('cards') }}">Retour aux cartes</a>
+            <a href="{{ route('languages.index') }}">Retour aux langues</a>
         </p>
     </x-ui.card>
 </x-layouts.blank>

@@ -1,0 +1,64 @@
+@use '../abstracts' as *;
+
+// Asymmetric tile field.
+//
+// ONE COLUMN BELOW `lg` IS THE DEFAULT STATE, not a media-query undo: the span
+// modifiers live inside `up('lg')` only, so `--cell-span` can never create a
+// phantom implicit column on a phone and there is no collapse logic to get
+// wrong. Placement at lg is pure auto-flow from DOM order plus spans — no
+// `grid-template-areas`, so visual order and tab order cannot drift apart.
+//
+// This layer paints NOTHING. Material comes from glass-surface() at the call
+// site. Knobs follow the local-knob convention `.grid` and `.split` already
+// establish (--grid-min, --split-gap): declared as var() fallbacks in the rule,
+// never in :root.
+//
+// Never add `overflow`, `contain`, `transform`, `filter` or `backdrop-filter`
+// here. The deck's action bar is `position: fixed` below lg and lives inside a
+// cell, and any of those would make this element its containing block and
+// detach the whole mobile control bar from the viewport.
+.bento {
+    display: grid;
+    gap: var(--bento-gap, #{space(3)});
+    grid-template-columns: 1fr;
+
+    @include up('md') {
+        gap: var(--bento-gap, #{space(4)});
+    }
+
+    @include up('lg') {
+        gap: var(--bento-gap, #{space(5)});
+        grid-template-columns: repeat(var(--bento-columns, 6), minmax(0, 1fr));
+        align-items: start;
+    }
+}
+
+.bento__cell {
+    min-width: 0;
+
+    @include up('lg') {
+        grid-column: span var(--cell-span, 6);
+        grid-row: span var(--cell-rows, 1);
+    }
+}
+
+@each $n in (1, 2, 3, 4, 5, 6) {
+    .bento__cell--span-#{$n} {
+        --cell-span: #{$n};
+    }
+}
+
+@each $n in (2, 3) {
+    .bento__cell--rows-#{$n} {
+        --cell-rows: #{$n};
+    }
+}
+
+// Opt-in: fill the row band rather than sitting at its top. Only the hero takes
+// this, so the rail's cells deliberately do NOT bottom-align with it — that
+// offset is what makes the field read as bento rather than as two columns.
+.bento__cell--stretch {
+    @include up('lg') {
+        align-self: stretch;
+    }
+}

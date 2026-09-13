@@ -1,10 +1,21 @@
 @php
     /**
-     * The prompt the user pastes into Claude alongside photos of their textbook
-     * pages. It asks for exactly the shape `App\Support\WordList` reads back.
+     * The prompt the user pastes into Claude alongside photos of their
+     * textbook pages. It asks for exactly the shape `App\Support\WordList`
+     * reads back, in whichever language the deck belongs to.
      */
-    $claudePrompt = <<<'TXT'
-        Voici des photos de pages de vocabulaire allemand / français.
+    $subject = $kind === \App\Support\UnitKind::Verbs
+        ? 'de pages de verbes '.mb_strtolower($language->name).' / français'
+        : 'de pages de vocabulaire '.mb_strtolower($language->name).' / français';
+
+    $code = $language->code;
+
+    // The format is shown with the language's own sample entry, so the prompt
+    // never illustrates German to someone learning English.
+    $example = $sampleList;
+
+    $claudePrompt = <<<TXT
+        Voici des photos {$subject}.
 
         Transcris chaque entrée en JSON. Ne traduis rien et ne corrige rien :
         - copie les deux colonnes telles qu'imprimées, avec les articles, les marques
@@ -18,13 +29,10 @@
           entrée de la section ; null si la page n'a pas d'intertitres ;
         - si un mot est coupé, flou ou illisible, omets l'entrée plutôt que de deviner.
 
-        Réponds uniquement avec le JSON, sans texte autour, à ce format exact :
+        Réponds uniquement avec le JSON, sans texte autour, à ce format exact,
+        où "fr" porte le français et "{$code}" le mot étranger :
 
-        [
-          {"fr": "l'homme, l'être humain", "de": "der Mensch, en, en", "ex": null, "sec": "Personalien"},
-          {"fr": "la mère", "de": "die Mutter, ¨", "ex": null, "sec": "Familie"},
-          {"fr": "mourir (de)", "de": "*sterben (an + D)", "ex": "stirbt, starb, ist gestorben", "sec": "Personalien"}
-        ]
+        {$example}
         TXT;
 @endphp
 

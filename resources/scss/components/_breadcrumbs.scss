@@ -20,7 +20,14 @@
     }
 }
 
+// A breadcrumb is inline text, so its hit area can only come from padding:
+// `min-block-size` does nothing on a non-replaced inline box. The matching
+// negative margin pulls the line box back to where it was, so the target grows
+// toward the touch floor without changing the trail's rhythm. No hover scale
+// for the same reason — this is text, not a control.
 .breadcrumbs__link {
+    margin-block: calc(#{space(1)} * -1);
+    padding-block: space(1);
     color: inherit;
     text-decoration: none;
 
@@ -33,4 +40,12 @@
 .breadcrumbs__current {
     font-weight: 500;
     color: var(--color-text);
+}
+
+// With `heading`, the last crumb IS the page's <h1>. It has to keep the
+// trail's size and rhythm rather than the browser's own, which would set it
+// at 2em with a margin either side and break the row.
+h1.breadcrumbs__current {
+    margin: 0;
+    font-size: inherit;
 }

@@ -1,0 +1,95 @@
+// -----------------------------------------------------------------------------
+// Shared keyframes
+//
+// `@keyframes` names are global, and `base` is the first layer that emits CSS,
+// so anything declared here can be named by every later layer. It also means a
+// duplicate name declared here would silently LOSE to a component's own
+// definition — check with grep before adding one. Already taken elsewhere:
+// dropdown-in, modal-in, backdrop-in, toast-in, toast-out, spin, skeleton.
+//
+// Every appear state in this app is an `animation` rather than a transition,
+// because `[hidden] { display: none !important }` in the reset cannot be
+// transitioned. An animation replays each time the element is re-displayed,
+// which is exactly the reveal moment. Wrap the call site in `state-enter()` so
+// the motion preference is honoured.
+//
+// All of these drive the standalone `scale` / `translate` properties rather
+// than `transform`, matching every keyframe already in the codebase, so they
+// compose with a card's 3D flip instead of clobbering it.
+// -----------------------------------------------------------------------------
+
+@use '../abstracts' as *;
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        translate: 0 #{rem(8)};
+    }
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        translate: 0 #{rem(6)};
+    }
+}
+
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        scale: 0.94;
+    }
+}
+
+// A count just changed. Scale only — the figure keeps `transform` free.
+@keyframes stat-tick {
+    0% {
+        scale: 1;
+    }
+
+    28% {
+        scale: 1.14;
+    }
+
+    100% {
+        scale: 1;
+    }
+}
+
+// An expanding halo on the tile whose number moved. Runs on a `::after` and
+// animates opacity and scale ONLY — both compositor-only. It must never touch
+// the tile's own box-shadow: that would override the selected tile's
+// --surface-shadow and make the active filter visibly SINK at the exact moment
+// it is meant to celebrate, and box-shadow spread is not compositable, so two
+// tiles would repaint for 620ms in the same frame as the 24-particle burst,
+// the white flash and a card re-render.
+@keyframes stat-pulse {
+    from {
+        opacity: 0.9;
+        scale: 0.94;
+    }
+
+    to {
+        opacity: 0;
+        scale: 1.06;
+    }
+}
+
+@keyframes nudge-x {
+    0%,
+    100% {
+        translate: 0 0;
+    }
+
+    22% {
+        translate: #{rem(-5)} 0;
+    }
+
+    48% {
+        translate: #{rem(4)} 0;
+    }
+
+    74% {
+        translate: #{rem(-2)} 0;
+    }
+}

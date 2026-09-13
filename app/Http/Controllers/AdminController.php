@@ -37,14 +37,14 @@ class AdminController extends Controller
         $request->session()->put(self::SESSION_KEY, true);
         $request->session()->regenerate();
 
-        return redirect()->route('cards')->with('success', 'Mode administrateur activé.');
+        return redirect()->route('languages.index')->with('success', 'Mode administrateur activé.');
     }
 
     public function logout(Request $request): RedirectResponse
     {
         $request->session()->forget(self::SESSION_KEY);
 
-        return redirect()->route('cards')->with('status', 'Mode administrateur quitté.');
+        return redirect()->route('languages.index')->with('status', 'Mode administrateur quitté.');
     }
 
     public static function isConfigured(): bool

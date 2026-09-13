@@ -3,19 +3,27 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['chapter_id', 'section', 'de', 'fr', 'example', 'position'])]
+/**
+ * One two-sided card: `term` is the word in the language being learnt,
+ * `translation` is the French side. Vocabulary and verbs share this shape.
+ */
+#[Fillable(['unit_id', 'section', 'term', 'translation', 'example', 'position'])]
 class Card extends Model
 {
+    /** @use HasFactory<\Database\Factories\CardFactory> */
+    use HasFactory;
+
     /**
-     * @return BelongsTo<Chapter, $this>
+     * @return BelongsTo<Unit, $this>
      */
-    public function chapter(): BelongsTo
+    public function unit(): BelongsTo
     {
-        return $this->belongsTo(Chapter::class);
+        return $this->belongsTo(Unit::class);
     }
 
     /**

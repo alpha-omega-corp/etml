@@ -5,15 +5,24 @@
     --alert-fg: var(--color-text);
     --alert-accent: var(--color-border-strong);
 
+    // Glass drawn on the variant's own fill, with no sheen: the `*-soft`
+    // grounds are already tinted and a white gradient over them reads as fog.
+    // No drop shadow either — an alert sits *in* the content flow rather than
+    // above it. The mixin zeroes `border` so its ambient ring can share the
+    // radius; the accent rule is therefore re-stated after it.
+    @include glass-surface(var(--radius-md), var(--alert-bg), var(--glass-edges), var(--shadow-none), false);
+
+    // Entry only. dismiss.js removes the node synchronously on click with no
+    // class and no delay, so an exit animation would be gone before its first
+    // frame painted.
+    @include state-enter(rise-in);
+
     display: flex;
     gap: space(3);
     padding: space(4);
     font-size: var(--text-sm);
     color: var(--alert-fg);
-    background-color: var(--alert-bg);
-    border: 1px solid color-mix(in oklab, var(--alert-accent) 35%, transparent);
     border-inline-start: 3px solid var(--alert-accent);
-    border-radius: var(--radius-md);
 }
 
 .alert__icon {
@@ -42,18 +51,32 @@
     color: color-mix(in oklab, var(--alert-fg) 80%, transparent);
 }
 
+// The hit area is raised to the 44px floor unconditionally, not through
+// `tap-target()`: 24px is under the floor on a desktop pointer too. Only the
+// box grows — the icon stays at 16px.
+//
+// The resting dimming is a colour mix rather than `opacity`, for two reasons.
+// `interactive()` owns `transition` here, and a second shorthand in this rule
+// would replace its whole list — including inside motion-safe, where the
+// mixin's media block is emitted last and wins — so the fade rides the `color`
+// entry the mixin already carries. And `opacity` dims the element's outline
+// along with its icon, which would have left the focus ring at 60% strength.
 .alert__dismiss {
+    @include interactive(1.06, 0.92);
     @include focus-visible;
 
+    display: inline-grid;
     flex-shrink: 0;
+    place-items: center;
     align-self: flex-start;
+    min-block-size: var(--tap-target);
+    min-inline-size: var(--tap-target);
     padding: space(1);
-    color: inherit;
+    color: color-mix(in oklab, var(--alert-fg) 60%, transparent);
     border-radius: var(--radius-sm);
-    opacity: 0.6;
 
     &:hover {
-        opacity: 1;
+        color: var(--alert-fg);
     }
 
     svg {

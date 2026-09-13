@@ -1,6 +1,13 @@
 @use '../abstracts' as *;
 
+// The only real container in this group, and so the only one that earns a
+// surface — an empty state is a panel the page hands you when it has nothing
+// to show, not an inline mark. glass-surface() alone, never glass-frost():
+// nothing scrolls behind an empty state, so a blur would buy a compositor
+// layer and a per-frame re-sample to return the same gradient it started with.
 .empty-state {
+    @include glass-surface(var(--radius-xl));
+
     display: grid;
     justify-items: center;
     padding: space(12) space(6);

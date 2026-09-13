@@ -36,10 +36,20 @@
 
 // Page shells ----------------------------------------------------------------
 
+// The canvas light source. It goes on the element itself rather than a
+// pseudo-element: `.app-body` is `display: flex`, so an in-flow `::before`
+// would become a flex item and consume layout, and a fixed one would cost a
+// full-viewport recomposite every time the iOS URL bar collapses. Because this
+// element is `min-height: 100svh` the gradient covers the whole scroll height,
+// including the deck's bottom clearance, with no `background-attachment: fixed`
+// and its iOS jank. `body`'s flat `background-color` in the reset stays
+// underneath as the ground and the no-gradient fallback.
 .app-body {
     display: flex;
     flex-direction: column;
     min-height: 100svh;
+    background-image: var(--canvas-gradient);
+    background-repeat: no-repeat;
 }
 
 .app-main {
