@@ -35,6 +35,7 @@
 
     <div class="cluster push-end" style="--cluster-gap: 0">
         <x-ui.theme-toggle />
+        <x-ui.accent-picker />
 
         <x-ui.dropdown>
             <x-slot:trigger>

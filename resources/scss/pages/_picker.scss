@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
 // Language picker
 //
-// The front door. One tile per language, each carrying what it holds, how far
-// the user has got and the next date on its programme — enough to choose from
-// without opening anything.
+// The front door. One tile per language, each carrying what it holds and how
+// far the user has got — enough to choose from without opening anything. The
+// programme lives one click away, on the language's own page.
 // -----------------------------------------------------------------------------
 
 @use '../abstracts' as *;
@@ -24,15 +24,30 @@
     }
 }
 
+// Title and lead read as one block, so they sit closer than the page's gap.
+.picker__head {
+    display: grid;
+    gap: space(2);
+    margin-block-end: space(2);
+}
+
 .picker__title {
     margin: 0;
     font-family: var(--font-display);
-    font-size: var(--text-3xl);
+    font-size: var(--text-4xl);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
     text-wrap: balance;
+
+    // The verb is the point of the question, so it carries the accent.
+    em {
+        font-style: normal;
+        color: var(--color-accent);
+    }
 }
 
 .picker__lead {
-    margin: 0 0 space(2);
+    margin: 0;
     color: var(--color-text-muted);
     text-wrap: pretty;
 }
@@ -156,16 +171,4 @@
     height: 100%;
     background-color: var(--color-success);
     border-radius: inherit;
-}
-
-.lang-card__next {
-    display: flex;
-    gap: space(2);
-    align-items: center;
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-}
-
-.lang-card__next--none {
-    color: var(--color-text-subtle);
 }

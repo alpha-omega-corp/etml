@@ -12,7 +12,8 @@
  */
 
 const STORAGE_KEY = 'accent';
-const DEFAULT = 'green';
+// Must match `$accent-default` in resources/scss/base/_root.scss.
+const DEFAULT = 'orange';
 
 export const ACCENTS = ['green', 'orange', 'blue', 'purple'];
 

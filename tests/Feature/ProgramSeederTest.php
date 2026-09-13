@@ -24,8 +24,9 @@ class ProgramSeederTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // `DatabaseSeeder` calls `ProgramSeeder`, so the default seed is the
+        // whole fixture: languages, decks and the dates pointing at them.
         $this->seed();
-        $this->seed(\Database\Seeders\ProgramSeeder::class);
         $this->post('/login', ['username' => 'anna']);
     }
 

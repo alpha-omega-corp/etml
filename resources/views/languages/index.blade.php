@@ -2,11 +2,10 @@
 
 <main id="main" class="picker">
 
-    <h1 class="picker__title">Que voulez-vous apprendre&nbsp;?</h1>
-    <p class="picker__lead">
-        Chaque langue a son programme, son vocabulaire et ses verbes. Vos
-        cartes « je sais » vous suivent d'une langue à l'autre.
-    </p>
+    <header class="picker__head">
+        <h1 class="picker__title">Que voulez-vous <em>apprendre</em>&nbsp;?</h1>
+        <p class="picker__lead">Vos cartes « je sais » vous suivent d'une langue à l'autre.</p>
+    </header>
 
     @if ($languages->isEmpty())
         <x-ui.empty-state
@@ -46,16 +45,6 @@
                         <span class="lang-card__progress" role="img" aria-label="{{ $percent }} % connu">
                             <span class="lang-card__progress-fill" style="width: {{ $percent }}%"></span>
                         </span>
-
-                        @if ($row['next'])
-                            <span class="lang-card__next">
-                                <x-ui.icon name="clock" size="14" />
-                                {{ $row['next']->title ?? 'Prochaine date' }} ·
-                                {{ $row['next']->date->translatedFormat('j F') }}
-                            </span>
-                        @else
-                            <span class="lang-card__next lang-card__next--none">Aucune date au programme</span>
-                        @endif
                     </a>
                 </li>
             @endforeach

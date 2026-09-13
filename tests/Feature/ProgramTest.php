@@ -21,6 +21,9 @@ class ProgramTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        // The seed now ships both programmes; this suite writes its own dates,
+        // so it starts from an empty calendar.
+        ProgramEntry::query()->delete();
         config(['admin.password' => 'ouvre-toi']);
         $this->post('/login', ['username' => 'anna']);
     }

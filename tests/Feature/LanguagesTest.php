@@ -41,7 +41,8 @@ class LanguagesTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('Que voulez-vous apprendre')
+            // The verb is lifted out of the heading so it can carry the accent.
+            ->assertSee('<h1 class="picker__title">Que voulez-vous <em>apprendre</em>&nbsp;?</h1>', false)
             ->assertSee('Allemand')
             ->assertSee('Deutsch')
             ->assertSee('Anglais')
@@ -89,7 +90,11 @@ class LanguagesTest extends TestCase
         $this->assertStringContainsString('connues', $html);
     }
 
-    public function test_the_tile_names_the_next_date_on_the_programme(): void
+    /**
+     * The tile is a choice, not a briefing: it counts cards and nothing else.
+     * A language's dates belong to its own page.
+     */
+    public function test_the_tile_says_nothing_about_the_programme(): void
     {
         $german = Language::where('slug', 'allemand')->firstOrFail();
 
@@ -99,18 +104,38 @@ class LanguagesTest extends TestCase
             'title' => 'Test 1',
         ]);
 
-        // A date already gone must not be the one advertised.
-        ProgramEntry::create([
-            'language_id' => $german->id,
-            'date' => Carbon::today()->subWeek()->toDateString(),
-            'title' => 'Test 0',
-        ]);
-
         $this->get('/')
             ->assertOk()
-            ->assertSee('Test 1')
-            ->assertDontSee('Test 0')
-            ->assertSee('Aucune date au programme');  // English has none
+            ->assertDontSee('Test 1')
+            ->assertDontSee('Aucune date au programme')
+            ->assertDontSee('lang-card__next', false);
+    }
+
+    /**
+     * The bar carries both theme axes: the light/dark toggle and the accent
+     * palette. Orange is the shipped accent, so it leads the list.
+     */
+    public function test_the_bar_offers_the_theme_toggle_and_the_accent_picker(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-theme-toggle', $html);
+        $this->assertStringContainsString('data-accent-picker', $html);
+
+        $this->assertSame(
+            ['orange', 'green', 'blue', 'purple'],
+            $this->accentOptions($html),
+        );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function accentOptions(string $html): array
+    {
+        preg_match_all('/data-accent-option="([a-z]+)"/', $html, $matches);
+
+        return $matches[1];
     }
 
     public function test_progress_is_counted_per_language(): void

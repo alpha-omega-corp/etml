@@ -1,5 +1,5 @@
 @props([
-    'label' => 'Accent colour',
+    'label' => 'Couleur d\'accent',
 ])
 
 @php
@@ -14,10 +14,10 @@
      * resources/js/components/accent.js. Add one in all three places.
      */
     $accents = [
-        'green' => ['label' => 'Green', 'swatch' => '#0f5f52'],
         'orange' => ['label' => 'Orange', 'swatch' => '#a14310'],
-        'blue' => ['label' => 'Blue', 'swatch' => '#1a4d9c'],
-        'purple' => ['label' => 'Purple', 'swatch' => '#5b3a9e'],
+        'green' => ['label' => 'Vert', 'swatch' => '#0f5f52'],
+        'blue' => ['label' => 'Bleu', 'swatch' => '#1a4d9c'],
+        'purple' => ['label' => 'Violet', 'swatch' => '#5b3a9e'],
     ];
 @endphp
 

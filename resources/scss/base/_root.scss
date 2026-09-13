@@ -7,7 +7,7 @@
 //
 // There are two independent theme axes:
 //   * mode   — dark is the designed default; light is an explicit opt-out
-//   * accent — the palette, driven by `[data-accent]` (green is the default)
+//   * accent — the palette, driven by `[data-accent]` (orange is the default)
 //
 // Mode resolution order:
 //   1. Nothing on <html> — the floor, which is dark. This is what a visitor
@@ -45,7 +45,7 @@ $accents: (
     ),
 ) !default;
 
-$accent-default: 'green' !default;
+$accent-default: 'orange' !default;
 
 /// Emit the five accent tokens plus the focus colour for one accent and mode.
 /// The focus ring tracks the base colour in light and the hover step in dark,

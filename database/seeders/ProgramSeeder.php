@@ -10,9 +10,9 @@ use Illuminate\Database\Seeder;
 /**
  * The school programmes, in the same JSON an administrator would paste.
  *
- * Deliberately NOT part of `DatabaseSeeder`: a programme is one class's own
- * calendar for one school year, not a fixture the application needs. Load it
- * with `php artisan db:seed --class=ProgramSeeder`.
+ * Runs after `CardSeeder` so its dates link to the units the decks created
+ * instead of creating empty twins. Re-running replaces the dates it owns, so
+ * it is safe on its own too: `php artisan db:seed --class=ProgramSeeder`.
  */
 class ProgramSeeder extends Seeder
 {

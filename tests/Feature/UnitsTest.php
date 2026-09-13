@@ -20,10 +20,18 @@ class UnitsTest extends TestCase
 
     private const MAP = '{"la maison": "das Haus, ¨er", "la cuisine": "die Küche, n"}';
 
+    /**
+     * How many units the seed leaves behind: the decks, plus the empty
+     * chapters the seeded programme points at. Counted rather than written
+     * down, so adding a deck or a date does not break every refusal test.
+     */
+    private int $seededUnits;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->seed();
+        $this->seededUnits = Unit::count();
         $this->post('/login', ['username' => 'anna']);
     }
 
@@ -119,7 +127,9 @@ class UnitsTest extends TestCase
         $unit = Unit::where('name', 'II. Die Wohnung')->firstOrFail();
         $this->assertSame($this->german()->id, $unit->language_id);
         $this->assertSame(UnitKind::Vocabulary, $unit->kind);
-        $this->assertSame(3, $unit->position);
+        // Behind the two seeded decks and the eight chapters the programme
+        // reserved for the rest of the year.
+        $this->assertSame(11, $unit->position);
 
         $cards = $unit->cards()->get();
         $this->assertCount(2, $cards);
@@ -214,7 +224,7 @@ class UnitsTest extends TestCase
         $this->post('/units', ['language' => 'allemand', 'name' => 'Cassé', 'words' => '{"la maison": '])
             ->assertSessionHasErrors('words');
 
-        $this->assertSame(5, Unit::count());
+        $this->assertSame($this->seededUnits, Unit::count());
     }
 
     public function test_it_rejects_a_json_value_that_is_not_a_string(): void
@@ -222,7 +232,7 @@ class UnitsTest extends TestCase
         $this->post('/units', ['language' => 'allemand', 'name' => 'Cassé', 'words' => '{"la maison": ["das Haus"]}'])
             ->assertSessionHasErrors('words');
 
-        $this->assertSame(5, Unit::count());
+        $this->assertSame($this->seededUnits, Unit::count());
     }
 
     public function test_it_rejects_a_list_entry_missing_a_side(): void
@@ -236,7 +246,7 @@ class UnitsTest extends TestCase
         $this->post('/units', ['language' => 'allemand', 'name' => 'Vide', 'words' => '{}'])
             ->assertSessionHasErrors('words');
 
-        $this->assertSame(5, Unit::count());
+        $this->assertSame($this->seededUnits, Unit::count());
     }
 
     public function test_it_requires_a_name_and_a_list(): void
@@ -244,7 +254,7 @@ class UnitsTest extends TestCase
         $this->post('/units', ['language' => 'allemand', 'name' => '', 'words' => self::MAP])->assertSessionHasErrors('name');
         $this->post('/units', ['language' => 'allemand', 'name' => 'Sans mots', 'words' => ''])->assertSessionHasErrors('words');
 
-        $this->assertSame(5, Unit::count());
+        $this->assertSame($this->seededUnits, Unit::count());
     }
 
     public function test_it_refuses_more_than_the_entry_cap(): void
@@ -257,7 +267,7 @@ class UnitsTest extends TestCase
         $this->post('/units', ['language' => 'allemand', 'name' => 'Trop', 'words' => json_encode($words)])
             ->assertSessionHasErrors('words');
 
-        $this->assertSame(5, Unit::count());
+        $this->assertSame($this->seededUnits, Unit::count());
     }
 
     // --- filling a unit that was left empty -----------------------------------
@@ -376,6 +386,6 @@ class UnitsTest extends TestCase
         $this->patch("/units/{$unit->id}", ['rename' => 'Pirate'])->assertRedirect('/login');
         $this->post("/units/{$unit->id}/import", ['import' => self::MAP])->assertRedirect('/login');
 
-        $this->assertSame(5, Unit::count());
+        $this->assertSame($this->seededUnits, Unit::count());
     }
 }
