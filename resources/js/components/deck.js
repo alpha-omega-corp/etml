@@ -507,7 +507,9 @@ function play(config) {
 }
 
 /**
- * The whole list, flat and alphabetical by the French side.
+ * The whole list, flat and alphabetical by the French side. When the page
+ * carries a selection form, every line also gets a tick: that is how a user
+ * cuts a deck of their own out of the list.
  */
 function vocabulary(deck) {
     const template = el('vocabRows');
@@ -517,6 +519,7 @@ function vocabulary(deck) {
     }
 
     const host = template.parentElement;
+    const form = document.querySelector('[data-pick]');
     const rows = [];
 
     // The search ignores accents and ligatures: « etre » finds « l'être »,
@@ -533,6 +536,26 @@ function vocabulary(deck) {
 
     deck.slice().sort((a, b) => a.translation.localeCompare(b.translation, 'fr')).forEach((card) => {
         const row = document.createElement('tr');
+
+        if (form) {
+            // The tick belongs to the form in the footer, not to the table it
+            // sits in: `form=` is what lets the list scroll under a bar that
+            // stays put.
+            const cell = document.createElement('td');
+            cell.className = 'vocab__pick';
+
+            const box = document.createElement('input');
+            box.type = 'checkbox';
+            box.className = 'choice__control';
+            box.name = 'cards[]';
+            box.value = card.id;
+            box.setAttribute('form', form.id);
+            box.setAttribute('aria-label', 'Choisir « ' + card.translation + ' »');
+
+            cell.append(box);
+            row.append(cell);
+        }
+
         const translation = document.createElement('td');
         translation.textContent = card.translation;
         const term = document.createElement('td');
@@ -566,4 +589,70 @@ function vocabulary(deck) {
 
     search.addEventListener('input', filter);
     filter();
+
+    if (form) {
+        picking(form, host);
+    }
+}
+
+/**
+ * The bar under the list: how many words are ticked, and what happens to them.
+ *
+ * A search only hides lines, so a word ticked in one search is still ticked
+ * after the next — the count is the truth, and it is read aloud as it changes.
+ */
+function picking(form, host) {
+    const count = el('pickCount');
+    const clear = form.querySelector('[data-pick-clear]');
+    const target = form.querySelector('[data-pick-target]');
+    const name = form.querySelector('[data-pick-name]');
+    const submit = form.querySelector('[data-pick-submit]');
+    const label = submit.querySelector('.btn__label');
+
+    const boxes = (extra = '') => host.querySelectorAll('input[type="checkbox"]' + extra);
+
+    function refresh() {
+        const chosen = boxes(':checked').length;
+
+        // An existing list is chosen by name in the dropdown, so the new-name
+        // box steps aside — disabled, or it would be sent along empty.
+        const adding = target !== null && target.value !== '';
+
+        count.textContent = chosen === 0
+            ? 'Aucun mot choisi'
+            : chosen + (chosen === 1 ? ' mot choisi' : ' mots choisis');
+
+        clear.hidden = chosen === 0;
+        name.hidden = adding;
+        name.disabled = adding;
+        label.textContent = adding ? 'Ajouter à la sélection' : 'Créer la sélection';
+        submit.disabled = chosen === 0 || (! adding && name.value.trim().length < 2);
+    }
+
+    host.addEventListener('change', (event) => {
+        if (event.target.matches('input[type="checkbox"]')) refresh();
+    });
+
+    // The whole line is the tick: a word list read on a phone is no place to
+    // aim for an 18px box.
+    host.addEventListener('click', (event) => {
+        if (event.target.closest('input')) return;
+
+        const box = event.target.closest('tr')?.querySelector('input[type="checkbox"]');
+
+        if (! box) return;
+
+        box.checked = ! box.checked;
+        refresh();
+    });
+
+    clear.onclick = () => {
+        boxes(':checked').forEach((box) => { box.checked = false; });
+        refresh();
+    };
+
+    name.addEventListener('input', refresh);
+    target?.addEventListener('change', refresh);
+
+    refresh();
 }

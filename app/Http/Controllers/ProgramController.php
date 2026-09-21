@@ -19,23 +19,28 @@ class ProgramController extends Controller
 {
     /**
      * A language's home page: the dated programme first, then everything it
-     * contains — the vocabulary chapters and the verb pages, each a deck.
+     * contains — the vocabulary chapters, the verb pages and the signed-in
+     * user's own selections, each a deck.
      */
     public function show(Request $request, Language $language): View
     {
         $request->session()->put('language_id', $language->id);
 
+        $userId = auth()->id();
+
         $vocabulary = $language->unitsOfKind(UnitKind::Vocabulary);
         $verbs = $language->unitsOfKind(UnitKind::Verbs);
+        $selections = $language->unitsOfKind(UnitKind::Selection, $userId);
 
-        $units = $vocabulary->merge($verbs);
+        $units = $vocabulary->merge($verbs)->merge($selections);
 
         return view('program.show', [
             'language' => $language,
             'entries' => $language->programEntries()->with('units')->get(),
             'vocabulary' => $vocabulary,
             'verbs' => $verbs,
-            'known' => CardState::knownPerUnit(auth()->id(), $units->pluck('id')->all()),
+            'selections' => $selections,
+            'known' => CardState::knownPerUnit($userId, $units->pluck('id')->all()),
         ]);
     }
 
@@ -109,7 +114,7 @@ class ProgramController extends Controller
                 $row['test'] = $entry->title;
             }
 
-            foreach (UnitKind::cases() as $kind) {
+            foreach (UnitKind::shared() as $kind) {
                 $names = $entry->units->where('kind', $kind)->pluck('name')->values();
 
                 if ($names->isNotEmpty()) {

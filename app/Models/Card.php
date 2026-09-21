@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -19,11 +20,24 @@ class Card extends Model
     use HasFactory;
 
     /**
+     * The unit that wrote the card, and deletes it.
+     *
      * @return BelongsTo<Unit, $this>
      */
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    /**
+     * Every list the card is on: the unit that wrote it, plus the selections
+     * users have put it in.
+     *
+     * @return BelongsToMany<Unit, $this>
+     */
+    public function units(): BelongsToMany
+    {
+        return $this->belongsToMany(Unit::class)->withPivot('position');
     }
 
     /**

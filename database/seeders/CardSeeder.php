@@ -66,6 +66,10 @@ class CardSeeder extends Seeder
                 ['section', 'term', 'translation', 'example', 'updated_at'],
             );
 
+            // The upsert fires no events, so the unit's list is rebuilt from
+            // the cards it now owns — the same list, never a doubled one.
+            $unit->relistOwnCards();
+
             $this->command?->info(count($rows)." mots dans « {$unit->name} » ({$language->name}).");
         }
     }

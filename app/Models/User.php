@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\UnitKind;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,16 @@ class User extends Authenticatable
     public function cardStates(): HasMany
     {
         return $this->hasMany(CardState::class);
+    }
+
+    /**
+     * The decks this user cut for themselves.
+     *
+     * @return HasMany<Unit, $this>
+     */
+    public function selections(): HasMany
+    {
+        return $this->hasMany(Unit::class)->where('kind', UnitKind::Selection)->orderBy('position');
     }
 
     /**

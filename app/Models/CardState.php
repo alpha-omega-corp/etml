@@ -30,8 +30,9 @@ class CardState extends Model
     }
 
     /**
-     * How many cards the user has marked « je sais » in each of the given
-     * units. Feeds every progress figure on screen, so it lives here rather
+     * How many cards the user has marked « je sais » on each of the given
+     * units' lists — a selection counts the very same marks its source
+     * chapter does. Feeds every progress figure on screen, so it lives here rather
      * than in the two controllers that need it.
      *
      * @param  array<int, int>  $unitIds
@@ -44,19 +45,21 @@ class CardState extends Model
         }
 
         return self::query()
-            ->join('cards', 'cards.id', '=', 'card_states.card_id')
+            ->join('card_unit', 'card_unit.card_id', '=', 'card_states.card_id')
             ->where('card_states.user_id', $userId)
             ->where('card_states.status', self::STATUS_KNOWN)
-            ->whereIn('cards.unit_id', $unitIds)
-            ->groupBy('cards.unit_id')
-            ->selectRaw('cards.unit_id as unit_id, count(*) as total')
+            ->whereIn('card_unit.unit_id', $unitIds)
+            ->groupBy('card_unit.unit_id')
+            ->selectRaw('card_unit.unit_id as unit_id, count(*) as total')
             ->pluck('total', 'unit_id')
             ->map(fn ($total) => (int) $total)
             ->all();
     }
 
     /**
-     * The same figure rolled up per language, for the picker.
+     * The same figure rolled up per language, for the picker. It counts
+     * cards, by the unit that wrote them, so a word in a selection is not
+     * counted twice.
      *
      * @return array<int, int> language id => known cards
      */

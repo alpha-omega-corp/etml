@@ -11,6 +11,7 @@ use App\Support\WordListSamples;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -79,6 +80,9 @@ class UnitController extends Controller
      */
     public function update(Request $request, Unit $unit): RedirectResponse|JsonResponse
     {
+        // A selection is renamed by the one person it belongs to.
+        abort_unless($unit->isVisibleTo(Auth::id()), 404);
+
         $data = $request->validate([
             'rename' => ['required', 'string', 'min:2', 'max:120'],
         ], [
@@ -103,6 +107,8 @@ class UnitController extends Controller
      */
     public function import(Request $request, Unit $unit): RedirectResponse
     {
+        abort_if($unit->kind->isPersonal(), 404);
+
         if (! $unit->isEmpty()) {
             return back()->withErrors(['import' => ucfirst($unit->kind->thisOne()).' contient déjà des mots.']);
         }
@@ -126,6 +132,10 @@ class UnitController extends Controller
      */
     public function destroy(Request $request, Unit $unit): RedirectResponse
     {
+        // A selection is nobody's to delete but its owner's, who has their own
+        // button for it.
+        abort_if($unit->kind->isPersonal(), 404);
+
         $name = $unit->name;
         $language = $unit->language;
 
@@ -155,7 +165,9 @@ class UnitController extends Controller
 
         $kind = UnitKind::fromSlug((string) $request->query('kind', $request->input('kind', 'vocabulaire')));
 
-        abort_if($kind === null, 404);
+        // A selection is cut out of a list that already exists, never pasted
+        // in, so this form does not make one.
+        abort_if($kind === null || $kind->isPersonal(), 404);
 
         return [$language, $kind];
     }
@@ -194,5 +206,8 @@ class UnitController extends Controller
             'created_at' => $now,
             'updated_at' => $now,
         ], $rows, array_keys($rows)));
+
+        // A bulk insert fires no events: the unit's own list is built here.
+        $unit->relistOwnCards();
     }
 }

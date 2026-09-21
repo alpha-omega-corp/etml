@@ -30,6 +30,8 @@ class Language extends Model
     }
 
     /**
+     * Every card written under this language.
+     *
      * @return HasManyThrough<Card, Unit, $this>
      */
     public function cards(): HasManyThrough
@@ -54,13 +56,18 @@ class Language extends Model
     }
 
     /**
-     * The units of one kind, ordered, with their card count.
+     * The units of one kind, ordered, with their card count. A user only ever
+     * sees what is shared plus what is theirs, so the reader is named.
      *
      * @return Collection<int, Unit>
      */
-    public function unitsOfKind(UnitKind $kind): Collection
+    public function unitsOfKind(UnitKind $kind, ?int $userId = null): Collection
     {
-        return $this->units()->where('kind', $kind)->withCount('cards')->get();
+        return $this->units()
+            ->where('kind', $kind)
+            ->visibleTo($userId)
+            ->withCount('cards')
+            ->get();
     }
 
     /**

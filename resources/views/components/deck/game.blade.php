@@ -3,7 +3,14 @@
     'unit',
     'cards',
     'states' => [],
+    'selections' => [],   // the user's own lists these words can go into
 ])
+
+@php
+    // A selection is cut out of a list somebody else wrote; it is not itself
+    // a list to cut from, so it carries no ticks.
+    $canPick = ! $unit->kind->isPersonal() && count($cards) > 0;
+@endphp
 
 {{--
     The card game. It is the same module for every language and both kinds of
@@ -113,11 +120,69 @@
         <p class="vocab__count" id="vocabCount"></p>
     </div>
 
-    <x-ui.table :headers="['Français', $language->faceLabel()]" compact>
+    <x-ui.table compact>
+        <x-slot:head>
+            <tr>
+                @if ($canPick)
+                    <th scope="col" class="vocab__pick"><span class="visually-hidden">Choisir</span></th>
+                @endif
+                <th scope="col">Français</th>
+                <th scope="col">{{ $language->faceLabel() }}</th>
+            </tr>
+        </x-slot:head>
+
         <template id="vocabRows"></template>
     </x-ui.table>
 
     <p class="vocab__empty" id="vocabEmpty" hidden>Aucun mot ne correspond.</p>
+
+    {{-- Ticking words here is how a user makes a deck of their own: the ticks
+         are checkboxes bound to the form in the footer by `form=`, so the list
+         can scroll under a bar that never moves. `deck.js` builds them with
+         the rows. --}}
+    @if ($canPick)
+        <x-slot:footer>
+            <form
+                id="selection-form"
+                method="POST"
+                action="{{ route('selections.store') }}"
+                class="pick"
+                data-pick
+            >
+                @csrf
+                <input type="hidden" name="unit" value="{{ $unit->id }}">
+
+                <p class="pick__count" id="pickCount" role="status">Aucun mot choisi</p>
+
+                <button type="button" class="btn btn--sm pick__clear" data-pick-clear hidden>
+                    Tout décocher
+                </button>
+
+                @if (count($selections) > 0)
+                    <select class="select pick__target" name="selection" data-pick-target aria-label="Ajouter à">
+                        <option value="">Nouvelle sélection</option>
+                        @foreach ($selections as $selection)
+                            <option value="{{ $selection->id }}">{{ $selection->name }}</option>
+                        @endforeach
+                    </select>
+                @endif
+
+                <input
+                    type="text"
+                    class="input pick__name"
+                    name="name"
+                    maxlength="120"
+                    placeholder="Nom de la sélection"
+                    aria-label="Nom de la sélection"
+                    data-pick-name
+                >
+
+                <x-ui.button type="submit" variant="primary" size="sm" icon="check" data-pick-submit disabled>
+                    Créer la sélection
+                </x-ui.button>
+            </form>
+        </x-slot:footer>
+    @endif
 </x-ui.modal>
 
 {{-- The deck itself, handed to the module. JSON in a `type="application/json"`

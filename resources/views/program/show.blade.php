@@ -166,15 +166,21 @@
         @endif
     </section>
 
-    @foreach ([[\App\Support\UnitKind::Vocabulary, $vocabulary], [\App\Support\UnitKind::Verbs, $verbs]] as [$kind, $units])
+    @foreach ([[\App\Support\UnitKind::Vocabulary, $vocabulary], [\App\Support\UnitKind::Verbs, $verbs], [\App\Support\UnitKind::Selection, $selections]] as [$kind, $units])
+        {{-- « Mes sélections » only appears once there is one: a selection is
+             cut out of a chapter's word list, never started from here. --}}
+        @continue ($kind->isPersonal() && $units->isEmpty())
+
         <section class="program__section" aria-labelledby="{{ $kind->value }}">
             <div class="program__section-head">
                 <h2 class="program__section-title" id="{{ $kind->value }}">{{ $kind->heading() }}</h2>
 
-                <a href="{{ route('units.create', ['language' => $language->slug, 'kind' => $kind->slug()]) }}" class="btn btn--sm">
-                    <x-ui.icon name="plus" size="14" />
-                    <span class="btn__label">{{ $kind->newLabel() }}</span>
-                </a>
+                @unless ($kind->isPersonal())
+                    <a href="{{ route('units.create', ['language' => $language->slug, 'kind' => $kind->slug()]) }}" class="btn btn--sm">
+                        <x-ui.icon name="plus" size="14" />
+                        <span class="btn__label">{{ $kind->newLabel() }}</span>
+                    </a>
+                @endunless
             </div>
 
             @if ($units->isEmpty())

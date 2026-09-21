@@ -58,6 +58,7 @@
                 :unit="$unit"
                 :cards="$deck"
                 :states="$states"
+                :selections="$selections"
             />
 
         @endif

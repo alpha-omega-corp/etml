@@ -1339,6 +1339,51 @@ body.is-nav-open {
     text-align: center;
 }
 
+// Choosing words -----------------------------------------------------------------
+
+// The tick column takes exactly what a tick needs; the two word columns keep
+// the rest. The whole line is clickable, so the cursor says so.
+.vocab__pick {
+    width: rem(28);
+    padding-inline-end: 0;
+}
+
+.table--compact tbody tr:has(.vocab__pick) {
+    cursor: pointer;
+}
+
+// The bar under the list: what is ticked, and what becomes of it. It wraps to
+// two rows on a phone rather than squeezing the name box out of reach.
+.pick {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    gap: space(3);
+    align-items: center;
+    min-width: 0;
+}
+
+// The count stays on the near end and pushes everything else to the far one,
+// whether or not « Tout décocher » is showing.
+.pick__count {
+    margin: 0;
+    margin-inline-end: auto;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+.pick__target,
+.pick__name {
+    flex: 0 1 rem(180);
+    min-width: rem(140);
+}
+
+.pick__name[hidden] {
+    display: none;
+}
+
 // Only takes up room when it has something to say.
 .deck__sync {
     font-size: var(--text-xs);

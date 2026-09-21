@@ -7,6 +7,7 @@ use App\Http\Controllers\DeckController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ProgramEntryController;
+use App\Http\Controllers\SelectionController;
 use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/cards/{card}/status', [CardController::class, 'setStatus'])->name('cards.status');
     Route::post('/cards/reset', [CardController::class, 'reset'])->name('cards.reset');
+
+    // A user's own deck, cut out of a list. Fixed first segment, so these
+    // stay clear of the `/{language}` block below.
+    Route::post('/selections', [SelectionController::class, 'store'])->name('selections.store');
+    Route::delete('/selections/{unit}', [SelectionController::class, 'destroy'])->name('selections.destroy');
 
     Route::get('/units/create', [UnitController::class, 'create'])->name('units.create');
     Route::post('/units', [UnitController::class, 'store'])->name('units.store');
