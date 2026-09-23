@@ -137,19 +137,23 @@ tr.group td{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:.78
 
 /* areas + tabs */
 .stick{position:sticky;top:0;z-index:20;padding-top:env(safe-area-inset-top,0px);background:color-mix(in srgb,var(--paper) 90%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+/* tucked away while reading down, back on the first scroll up */
+.stick{transition:transform .25s ease}
+.stick.is-tucked{transform:translateY(-100%)}
+@media (prefers-reduced-motion:reduce){.stick{transition:none}}
 .stick .rail{position:static;padding-top:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:0}
-.tabs{display:flex;gap:.4rem;max-width:760px;margin:0 auto;padding:.6rem 1.25rem .2rem}
-.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:.45rem;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:.95rem;padding:.55rem .6rem;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.tabs{display:flex;gap:.35rem;max-width:760px;margin:0 auto;padding:.4rem 1.25rem .1rem}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:.45rem;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:.85rem;line-height:1.2;padding:.3rem .5rem;border-radius:9px;border:1.5px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .tab:hover{color:var(--ink)}
 .tab:focus-visible{outline:2px solid var(--radical);outline-offset:2px}
 .tab[aria-selected="true"]{color:#fff;border-color:transparent}
 .tab[data-area="suisse"][aria-selected="true"]{background:var(--fed)}
 .tab[data-area="ind"][aria-selected="true"]{background:var(--ind)}
-.tab .n{font-size:.75rem;opacity:.8;font-weight:600}
+.tab .n{font-size:.7rem;opacity:.8;font-weight:600}
 .rail[hidden],.area[hidden]{display:none}
 .xlink{margin-top:1.2rem;padding:.8rem 1rem;border-radius:12px;border:1.5px dashed var(--line);font-size:1rem}
 .xlink a{color:var(--ink);font-weight:600}
-@media (max-width:600px){.tab{font-size:.85rem;flex-wrap:wrap;gap:0 .35rem;line-height:1.2}.tab .n{flex-basis:100%;text-align:center;font-size:.72rem}}
+@media (max-width:600px){.tab{font-size:.8rem;padding:.3rem .4rem}.tab .n{display:none}}
 @media print{.stick{position:static}.tabs{display:none}.area[hidden]{display:block}}
 /* ---------- sections ---------- */
 main{max-width:760px;margin:0 auto;padding:0 1.25rem 4rem}
@@ -250,11 +254,6 @@ details .ans{padding-bottom:.8rem}
 .key.info,.xlink{border:1px solid color-mix(in srgb,var(--info) 30%,transparent)!important}
 .key.warn{border:1px solid color-mix(in srgb,var(--warn) 35%,transparent)!important}
 
-.ic{display:inline-flex;align-items:center;justify-content:center;margin-right:.55rem;line-height:1}
-.tab .ic{margin-right:.5rem;font-size:1.05em}
-.reasons li b{display:flex;align-items:flex-start}
-.reasons li b .ic{margin-right:.6rem;margin-top:.15em}
-.xlink .ic{margin-right:.6rem;font-weight:700}
 </style>
 </head>
 <body>
@@ -267,8 +266,8 @@ details .ans{padding-bottom:.8rem}
 
 <div class="stick" id="stick">
   <div class="tabs" role="tablist" aria-label="Thèmes">
-    <button class="tab" role="tab" data-area="suisse" aria-controls="area-suisse" aria-selected="true"><span class="ic" aria-hidden="true">🇨🇭</span>Histoire suisse <span class="n">1291-1910</span></button>
-    <button class="tab" role="tab" data-area="ind" aria-controls="area-ind" aria-selected="false"><span class="ic" aria-hidden="true">🏭</span>Industrialisation <span class="n">1780-1939</span></button>
+    <button class="tab" role="tab" data-area="suisse" aria-controls="area-suisse" aria-selected="true">Histoire suisse <span class="n">1291-1910</span></button>
+    <button class="tab" role="tab" data-area="ind" aria-controls="area-ind" aria-selected="false">Industrialisation <span class="n">1780-1939</span></button>
   </div>
   <nav class="rail" data-area="suisse" aria-label="Frise : histoire suisse">
     <div class="rail-scroll"><ol>
@@ -498,7 +497,7 @@ details .ans{padding-bottom:.8rem}
       <li>Les emplois du tertiaire sont occupés <strong>à 50 % par des femmes</strong>, surtout dans l'<strong>hôtellerie</strong>, le <strong>commerce</strong>, la <strong>santé</strong> et l'<strong>enseignement</strong>.</li>
     </ul>
     <div class="key warn"><strong>À retenir :</strong> l'industrie se concentre dans le <strong>triangle d'or</strong> et le <strong>Jura</strong>, puis la Suisse devient peu à peu une <strong>société de services</strong>.</div>
-    <p class="xlink"><span class="ic" aria-hidden="true">↔</span><strong>Lien avec l'autre thème :</strong> pour le contexte européen de l'industrialisation (machine à vapeur, usines, deuxième industrialisation), voir <a href="#s-1780">Histoire de l'industrialisation</a>.</p>
+    <p class="xlink"><strong>Lien avec l'autre thème :</strong> pour le contexte européen de l'industrialisation (machine à vapeur, usines, deuxième industrialisation), voir <a href="#s-1780">Histoire de l'industrialisation</a>.</p>
   </section>
   <section class="era t-recap" id="s-recap-ch">
     <header class="era-head">
@@ -535,13 +534,13 @@ details .ans{padding-bottom:.8rem}
     </header>
     <h3>Pourquoi l'Angleterre est-elle le berceau de l'industrialisation ?</h3>
     <ul class="reasons">
-      <li><b><span class="ic" aria-hidden="true">🌾</span>Agriculture améliorée</b>Rendements agricoles plus élevés.</li>
-      <li><b><span class="ic" aria-hidden="true">👥</span>Croissance démographique</b>Plus de main-d'œuvre disponible.</li>
-      <li><b><span class="ic" aria-hidden="true">🚶</span>Exode rural</b>Des populations quittent les campagnes pour travailler dans les activités industrielles.</li>
-      <li><b><span class="ic" aria-hidden="true">💰</span>Capitaux</b>Disponibles grâce au commerce et aux bénéfices.</li>
-      <li><b><span class="ic" aria-hidden="true">⛏️</span>Charbon et fer</b>Ressources essentielles à l'industrie.</li>
-      <li><b><span class="ic" aria-hidden="true">⚖️</span>Libéralisme</b>Liberté économique et concurrence.</li>
-      <li><b><span class="ic" aria-hidden="true">🧵</span>Textile</b>La demande de coton stimule fortement l'industrie anglaise.</li>
+      <li><b>Agriculture améliorée</b>Rendements agricoles plus élevés.</li>
+      <li><b>Croissance démographique</b>Plus de main-d'œuvre disponible.</li>
+      <li><b>Exode rural</b>Des populations quittent les campagnes pour travailler dans les activités industrielles.</li>
+      <li><b>Capitaux</b>Disponibles grâce au commerce et aux bénéfices.</li>
+      <li><b>Charbon et fer</b>Ressources essentielles à l'industrie.</li>
+      <li><b>Libéralisme</b>Liberté économique et concurrence.</li>
+      <li><b>Textile</b>La demande de coton stimule fortement l'industrie anglaise.</li>
     </ul>
     <div class="key info"><strong>Innovation essentielle :</strong> la <strong>machine à vapeur</strong> fournit une énergie mécanique qui ne dépend plus directement d'un cours d'eau. Elle est utilisée dans les <strong>mines</strong>, les <strong>usines</strong> puis les <strong>locomotives</strong>.</div>
     <p class="def"><strong>Locomotive :</strong> véhicule motorisé qui tire les wagons d'un train. Le développement des locomotives favorise le chemin de fer.</p>
@@ -640,7 +639,7 @@ details .ans{padding-bottom:.8rem}
       <div class="side demo"><h3>Classes populaires</h3><p>Ouvriers, employés, artisans et travailleurs des services. Une partie vit dans une <strong>grande précarité</strong>.</p></div>
     </div>
     <div class="chain"><span class="lab">Chaîne à retenir</span><b>Industrialisation</b><i>→</i><b>emplois urbains</b><i>→</i><b>exode rural</b><i>→</i><b>urbanisation</b><i>→</i><b>nouvelles classes sociales</b><i>→</i><b>séparation sociale de l'espace urbain</b></div>
-    <p class="xlink"><span class="ic" aria-hidden="true">↔</span><strong>Lien avec l'autre thème :</strong> pour l'exemple de la Suisse (triangle d'or, émigration, société de services), voir <a href="#s-1800-1910">Histoire suisse, 1800-1910</a>.</p>
+    <p class="xlink"><strong>Lien avec l'autre thème :</strong> pour l'exemple de la Suisse (triangle d'or, émigration, société de services), voir <a href="#s-1800-1910">Histoire suisse, 1800-1910</a>.</p>
   </section>
   <section class="era t-recap" id="s-recap-ind">
     <header class="era-head">
@@ -768,6 +767,16 @@ details .ans{padding-bottom:.8rem}
     if(area.dataset.area!==cur) activate(area.dataset.area,id);
     else { el.scrollIntoView({behavior:smooth(),block:'start'}); flash(el); }
   });
+  let lastY=window.scrollY, holdUntil=0;
+  function tuck(){
+    const y=window.scrollY, delta=y-lastY;
+    if(Date.now()<holdUntil){lastY=y;return;}
+    if(Math.abs(delta)<6) return;
+    stick.classList.toggle('is-tucked',delta>0&&y>document.querySelector('.intro').offsetHeight+stick.offsetHeight);
+    lastY=y;
+  }
+  stick.addEventListener('click',()=>{holdUntil=Date.now()+1200;stick.classList.remove('is-tucked');},true);
+  window.addEventListener('scroll',tuck,{passive:true});
   window.addEventListener('scroll',onScroll,{passive:true});
   window.addEventListener('resize',()=>{setNavH();idxCur=-1;onScroll();});
 
@@ -777,6 +786,7 @@ details .ans{padding-bottom:.8rem}
   else { try{ start=localStorage.getItem('fiche-area')||'suisse'; }catch(e){} }
   activate(start, hel?hash:null, true);
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(setNavH);
+  if(window.ResizeObserver) new ResizeObserver(setNavH).observe(stick);
 })();
 </script>
 </body>
