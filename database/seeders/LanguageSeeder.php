@@ -17,6 +17,7 @@ class LanguageSeeder extends Seeder
     public const LANGUAGES = [
         'allemand' => ['name' => 'Allemand', 'code' => 'de', 'label' => 'Deutsch'],
         'anglais' => ['name' => 'Anglais', 'code' => 'en', 'label' => 'English'],
+        'histoire' => ['name' => 'Histoire', 'code' => 'hist', 'label' => 'Fiches de révision'],
     ];
 
     public function run(): void

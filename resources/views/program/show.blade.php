@@ -166,10 +166,31 @@
         @endif
     </section>
 
+    {{-- A subject that is read rather than drilled keeps notes; it only shows
+         the kinds of deck it actually has. --}}
+    @if ($notes->isNotEmpty())
+        <section class="program__section" aria-labelledby="notes">
+            <div class="program__section-head">
+                <h2 class="program__section-title" id="notes">Fiches</h2>
+            </div>
+
+            <ul class="unit-list">
+                @foreach ($notes as $note)
+                    <li class="unit-list__item">
+                        <a href="{{ route('notes.show', $note) }}" class="unit-card">
+                            <span class="unit-card__name">{{ $note->title }}</span>
+                            <span class="unit-card__count">{{ implode(' · ', $note->subjects) }}</span>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
     @foreach ([[\App\Support\UnitKind::Vocabulary, $vocabulary], [\App\Support\UnitKind::Verbs, $verbs], [\App\Support\UnitKind::Selection, $selections]] as [$kind, $units])
         {{-- « Mes sélections » only appears once there is one: a selection is
              cut out of a chapter's word list, never started from here. --}}
-        @continue ($kind->isPersonal() && $units->isEmpty())
+        @continue (($kind->isPersonal() || $notes->isNotEmpty()) && $units->isEmpty())
 
         <section class="program__section" aria-labelledby="{{ $kind->value }}">
             <div class="program__section-head">

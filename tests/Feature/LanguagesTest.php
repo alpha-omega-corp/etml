@@ -28,7 +28,7 @@ class LanguagesTest extends TestCase
     public function test_it_seeds_the_languages_in_order(): void
     {
         $this->assertSame(
-            ['Allemand', 'Anglais'],
+            ['Allemand', 'Anglais', 'Histoire'],
             Language::orderBy('position')->pluck('name')->all(),
         );
 

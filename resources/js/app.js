@@ -25,6 +25,7 @@ import * as dismiss from './components/dismiss';
 import * as drawer from './components/drawer';
 import * as dropdown from './components/dropdown';
 import * as modal from './components/modal';
+import * as noteFrame from './components/note-frame';
 import * as programEntry from './components/program-entry';
 import * as rename from './components/rename';
 import * as reset from './components/reset';
@@ -33,7 +34,7 @@ import * as theme from './components/theme';
 import carousel from './components/carousel';
 import * as toast from './components/toast';
 
-const behaviours = [theme, accent, copy, disclosure, dismiss, drawer, dropdown, modal, programEntry, rename, reset, tabs, toast, deck];
+const behaviours = [theme, accent, copy, disclosure, dismiss, drawer, dropdown, modal, noteFrame, programEntry, rename, reset, tabs, toast, deck];
 
 function start() {
     behaviours.forEach((behaviour) => behaviour.init());

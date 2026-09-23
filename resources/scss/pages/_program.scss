@@ -442,3 +442,29 @@
         margin-block-start: 0;
     }
 }
+
+// -----------------------------------------------------------------------------
+// A revision note: the trail, then the note's own page filling the rest of the
+// screen. The page scrolls inside its frame, so its sticky timeline still
+// sticks.
+// -----------------------------------------------------------------------------
+
+.note {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: space(3);
+    padding: space(4) space(4) 0;
+
+    @include up('md') {
+        padding-inline: space(6);
+    }
+}
+
+.note__page {
+    flex: 1 1 0;
+    width: 100%;
+    min-height: rem(480);
+    border: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}

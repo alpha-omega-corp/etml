@@ -15,7 +15,7 @@ class EnsureAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->session()->get(AdminController::SESSION_KEY) !== true) {
-            abort(403, "Réservé au mode administrateur.");
+            abort(403, 'Réservé au mode administrateur.');
         }
 
         return $next($request);

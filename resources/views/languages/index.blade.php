@@ -31,20 +31,29 @@
                             </span>
                         </span>
 
-                        <span class="lang-card__figures">
-                            <span class="lang-card__figure">
-                                <span class="lang-card__number">{{ $row['cards'] }}</span>
-                                <span class="lang-card__unit">cartes</span>
+                        @if ($row['cards'] === 0 && $row['notes'] > 0)
+                            <span class="lang-card__figures">
+                                <span class="lang-card__figure">
+                                    <span class="lang-card__number">{{ $row['notes'] }}</span>
+                                    <span class="lang-card__unit">{{ $row['notes'] > 1 ? 'fiches' : 'fiche' }}</span>
+                                </span>
                             </span>
-                            <span class="lang-card__figure">
-                                <span class="lang-card__number">{{ $row['known'] }}</span>
-                                <span class="lang-card__unit">connues</span>
+                        @else
+                            <span class="lang-card__figures">
+                                <span class="lang-card__figure">
+                                    <span class="lang-card__number">{{ $row['cards'] }}</span>
+                                    <span class="lang-card__unit">cartes</span>
+                                </span>
+                                <span class="lang-card__figure">
+                                    <span class="lang-card__number">{{ $row['known'] }}</span>
+                                    <span class="lang-card__unit">connues</span>
+                                </span>
                             </span>
-                        </span>
 
-                        <span class="lang-card__progress" role="img" aria-label="{{ $percent }} % connu">
-                            <span class="lang-card__progress-fill" style="width: {{ $percent }}%"></span>
-                        </span>
+                            <span class="lang-card__progress" role="img" aria-label="{{ $percent }} % connu">
+                                <span class="lang-card__progress-fill" style="width: {{ $percent }}%"></span>
+                            </span>
+                        @endif
                     </a>
                 </li>
             @endforeach

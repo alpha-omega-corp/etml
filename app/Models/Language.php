@@ -30,6 +30,16 @@ class Language extends Model
     }
 
     /**
+     * The revision notes of a subject that is read rather than drilled.
+     *
+     * @return HasMany<Note, $this>
+     */
+    public function notes(): HasMany
+    {
+        return $this->hasMany(Note::class)->orderBy('position');
+    }
+
+    /**
      * Every card written under this language.
      *
      * @return HasManyThrough<Card, Unit, $this>

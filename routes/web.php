@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\DeckController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ProgramEntryController;
 use App\Http\Controllers\SelectionController;
@@ -28,6 +29,9 @@ Route::middleware('auth')->group(function () {
     // stay clear of the `/{language}` block below.
     Route::post('/selections', [SelectionController::class, 'store'])->name('selections.store');
     Route::delete('/selections/{unit}', [SelectionController::class, 'destroy'])->name('selections.destroy');
+
+    Route::get('/notes/{note}', [NoteController::class, 'show'])->name('notes.show');
+    Route::get('/notes/{note}/page', [NoteController::class, 'page'])->name('notes.page');
 
     Route::get('/units/create', [UnitController::class, 'create'])->name('units.create');
     Route::post('/units', [UnitController::class, 'store'])->name('units.store');

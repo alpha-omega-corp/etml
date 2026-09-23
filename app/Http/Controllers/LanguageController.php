@@ -18,7 +18,7 @@ class LanguageController extends Controller
      */
     public function index(Request $request): View
     {
-        $languages = Language::withCount('units')->orderBy('position')->get();
+        $languages = Language::withCount(['units', 'notes'])->orderBy('position')->get();
 
         $totals = Card::query()
             ->join('units', 'units.id', '=', 'cards.unit_id')
@@ -32,6 +32,7 @@ class LanguageController extends Controller
             'languages' => $languages->map(fn (Language $language) => [
                 'language' => $language,
                 'units' => $language->units_count,
+                'notes' => $language->notes_count,
                 'cards' => (int) ($totals[$language->id] ?? 0),
                 'known' => $known[$language->id] ?? 0,
             ]),

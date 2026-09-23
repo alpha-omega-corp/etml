@@ -40,6 +40,7 @@ class ProgramController extends Controller
             'vocabulary' => $vocabulary,
             'verbs' => $verbs,
             'selections' => $selections,
+            'notes' => $language->notes()->get(['id', 'title', 'subjects']),
             'known' => CardState::knownPerUnit($userId, $units->pluck('id')->all()),
         ]);
     }
