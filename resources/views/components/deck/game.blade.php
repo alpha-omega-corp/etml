@@ -10,6 +10,8 @@
     // A selection is cut out of a list somebody else wrote; it is not itself
     // a list to cut from, so it carries no ticks.
     $canPick = ! $unit->kind->isPersonal() && count($cards) > 0;
+
+    $listTitle = $unit->kind === \App\Support\UnitKind::Verbs ? 'Tout le tableau' : 'Tout le vocabulaire';
 @endphp
 
 {{--
@@ -27,7 +29,7 @@
     <div class="deck__tools">
         <button type="button" class="vocab-open" data-modal-open="vocab">
             <x-ui.icon name="book" size="16" />
-            <span class="vocab-open__label">Tout le {{ $unit->kind === \App\Support\UnitKind::Verbs ? 'tableau' : 'vocabulaire' }}</span>
+            <span class="vocab-open__label">{{ $listTitle }}</span>
             <span class="vocab-open__count">{{ count($cards) }}</span>
         </button>
 
@@ -107,39 +109,88 @@
 
 </div>
 
-<x-ui.modal id="vocab" title="Tout le vocabulaire" class="modal--full">
-    <div class="vocab__search">
-        <input
-            type="search"
-            id="vocabSearch"
-            class="input"
-            placeholder="Rechercher en français ou en {{ mb_strtolower($language->name) }}…"
-            autocomplete="off"
-            aria-label="Rechercher un mot"
-        >
-        <p class="vocab__count" id="vocabCount"></p>
-    </div>
+<x-ui.modal
+    id="vocab"
+    :title="$listTitle"
+    :description="$unit->name.' · '.count($cards).' '.(count($cards) === 1 ? 'mot' : 'mots')"
+    class="modal--full"
+>
+    <div @class(['vocab', 'vocab--pick' => $canPick])>
+        <div class="vocab__bar">
+            <div class="vocab__search">
+                <label class="vocab__field">
+                    <x-ui.icon name="search" size="18" class="vocab__field-icon" />
+                    <input
+                        type="search"
+                        id="vocabSearch"
+                        class="input vocab__input"
+                        placeholder="Rechercher un mot…"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        enterkeyhint="search"
+                        aria-label="Rechercher en français ou en {{ mb_strtolower($language->name) }}"
+                    >
+                </label>
+                <p class="vocab__count" id="vocabCount" aria-live="polite"></p>
+            </div>
 
-    <x-ui.table compact>
-        <x-slot:head>
-            <tr>
+            {{-- The same marks as the deck's filters, so the words still to
+                 learn can be read — and, with the picker, ticked — at once. --}}
+            <div class="vocab__filters">
+                <div class="vocab__chips" role="group" aria-label="Filtrer la liste">
+                    <button type="button" class="vocab__chip" data-vocab-filter="all" aria-pressed="true">
+                        Tous <span class="vocab__chip-count">{{ count($cards) }}</span>
+                    </button>
+                    <button type="button" class="vocab__chip" data-vocab-filter="review" aria-pressed="false">
+                        <span class="vocab__dot vocab__dot--review" aria-hidden="true"></span>
+                        À revoir <span class="vocab__chip-count" data-vocab-tally="review">0</span>
+                    </button>
+                    <button type="button" class="vocab__chip" data-vocab-filter="known" aria-pressed="false">
+                        <span class="vocab__dot vocab__dot--known" aria-hidden="true"></span>
+                        Connus <span class="vocab__chip-count" data-vocab-tally="known">0</span>
+                    </button>
+                    <button type="button" class="vocab__chip" data-vocab-filter="new" aria-pressed="false">
+                        <span class="vocab__dot" aria-hidden="true"></span>
+                        Nouveaux <span class="vocab__chip-count" data-vocab-tally="new">0</span>
+                    </button>
+                </div>
+
                 @if ($canPick)
-                    <th scope="col" class="vocab__pick"><span class="visually-hidden">Choisir</span></th>
+                    <button type="button" class="vocab__all" data-pick-all>
+                        Tout cocher
+                    </button>
                 @endif
-                <th scope="col">Français</th>
-                <th scope="col">{{ $language->faceLabel() }}</th>
-            </tr>
-        </x-slot:head>
+            </div>
+        </div>
 
-        <template id="vocabRows"></template>
-    </x-ui.table>
+        {{-- The column heads only exist where the two words sit side by side.
+             On a phone they stack, French over the other language, and the
+             heads would label nothing. --}}
+        <div class="vocab__head" aria-hidden="true">
+            @if ($canPick)
+                <span></span>
+            @endif
+            <span>Français</span>
+            <span>{{ $language->faceLabel() }}</span>
+        </div>
 
-    <p class="vocab__empty" id="vocabEmpty" hidden>Aucun mot ne correspond.</p>
+        {{-- One line per word, built by `deck.js`. With the picker, a line is
+             a `<label>` around its tick, so the whole line toggles it without
+             a script having to aim for the box. --}}
+        <ul class="vocab__list" id="vocabList" role="list"></ul>
+
+        <div class="vocab__empty" id="vocabEmpty" hidden>
+            <x-ui.icon name="search" size="28" />
+            <p>Aucun mot ne correspond<span id="vocabQuery"></span>.</p>
+            <button type="button" class="btn btn--sm" id="vocabReset">Tout afficher</button>
+        </div>
+    </div>
 
     {{-- Ticking words here is how a user makes a deck of their own: the ticks
          are checkboxes bound to the form in the footer by `form=`, so the list
-         can scroll under a bar that never moves. `deck.js` builds them with
-         the rows. --}}
+         can scroll under a bar that never moves. Until a word is ticked the bar
+         is one line of help; the controls only take room once they can act. --}}
     @if ($canPick)
         <x-slot:footer>
             <form
@@ -152,34 +203,39 @@
                 @csrf
                 <input type="hidden" name="unit" value="{{ $unit->id }}">
 
-                <p class="pick__count" id="pickCount" role="status">Aucun mot choisi</p>
+                <div class="pick__summary">
+                    <p class="pick__count" id="pickCount" role="status">Cochez des mots pour en faire une sélection.</p>
 
-                <button type="button" class="btn btn--sm pick__clear" data-pick-clear hidden>
-                    Tout décocher
-                </button>
+                    <button type="button" class="btn btn--ghost btn--sm pick__clear" data-pick-clear hidden>
+                        Tout décocher
+                    </button>
+                </div>
 
-                @if (count($selections) > 0)
-                    <select class="select pick__target" name="selection" data-pick-target aria-label="Ajouter à">
-                        <option value="">Nouvelle sélection</option>
-                        @foreach ($selections as $selection)
-                            <option value="{{ $selection->id }}">{{ $selection->name }}</option>
-                        @endforeach
-                    </select>
-                @endif
+                <div class="pick__controls" data-pick-controls hidden>
+                    @if (count($selections) > 0)
+                        <select class="select pick__target" name="selection" data-pick-target aria-label="Ajouter à">
+                            <option value="">Nouvelle sélection</option>
+                            @foreach ($selections as $selection)
+                                <option value="{{ $selection->id }}">{{ $selection->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
 
-                <input
-                    type="text"
-                    class="input pick__name"
-                    name="name"
-                    maxlength="120"
-                    placeholder="Nom de la sélection"
-                    aria-label="Nom de la sélection"
-                    data-pick-name
-                >
+                    <input
+                        type="text"
+                        class="input pick__name"
+                        name="name"
+                        maxlength="120"
+                        placeholder="Ex. Mots difficiles"
+                        aria-label="Nom de la sélection"
+                        enterkeyhint="done"
+                        data-pick-name
+                    >
 
-                <x-ui.button type="submit" variant="primary" size="sm" icon="check" data-pick-submit disabled>
-                    Créer la sélection
-                </x-ui.button>
+                    <x-ui.button type="submit" variant="primary" icon="check" class="pick__submit" data-pick-submit disabled>
+                        Créer la sélection
+                    </x-ui.button>
+                </div>
             </form>
         </x-slot:footer>
     @endif

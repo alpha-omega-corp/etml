@@ -313,7 +313,7 @@ class UnitsTest extends TestCase
             ->assertSessionHasErrors('import');
 
         $this->assertSame(0, $unit->cards()->count());
-        $this->assertSame(570, Card::count());
+        $this->assertSame(696, Card::count());
     }
 
     // --- renaming --------------------------------------------------------------

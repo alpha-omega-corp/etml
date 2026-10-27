@@ -1283,101 +1283,512 @@ body.is-nav-open {
     border: 0;
     border-radius: 0;
 
+    // Nothing shows behind a dialog that covers the whole viewport, so the
+    // frost has nothing to blur — but the dialog's filter and its backdrop's
+    // still re-sample the full screen on every scrolled frame of a list of
+    // hundreds of rows, which is what made it crawl on a phone. An opaque
+    // fill, the same one the sticky search bar already paints, looks the same.
+    background-color: var(--color-surface-raised);
+    // The glass sheen too: it lightens the top of the dialog, and the sticky
+    // bar, painted flat, would show as a darker band across it.
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+
+    &::backdrop {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    // Fade only: scaling a full-screen layer re-rasterises every row when the
+    // animation ends.
+    &[open] {
+        @include motion-safe {
+            animation-name: backdrop-in;
+        }
+    }
+
     // A full-screen list of words has no need of a 24px frame on a 375px
     // screen: the words are the content, the margin is not.
     @include down('sm') {
         --vocab-gutter: #{space(3)};
     }
 
+    // On a wide screen the title lines up with the list's centred column.
     .modal__header {
-        padding: space(4) var(--vocab-gutter);
+        align-items: center;
+        padding: space(3) max(var(--vocab-gutter), calc((100% - #{rem(880)}) / 2));
     }
 
+    .modal__close {
+        align-self: center;
+    }
+
+    // No top padding: the sticky bar is the first thing in the body and pins
+    // to its very top edge, so nothing scrolls through a gap above it.
     .modal__body {
-        padding: var(--vocab-gutter);
+        padding: 0 var(--vocab-gutter) space(6);
     }
 
-    // The two columns keep their vertical rhythm and give back the inline
-    // padding, which is where the width actually goes.
+    .modal__footer {
+        padding: space(3) var(--vocab-gutter);
+        padding-block-end: calc(#{space(3)} + env(safe-area-inset-bottom));
+        border-radius: 0;
+    }
+
     @include down('sm') {
-        .table th,
-        .table td {
-            padding-inline: space(2);
+        .modal__title {
+            font-size: var(--text-base);
+        }
+
+        .modal__description {
+            margin-block-start: 0;
+            font-size: var(--text-xs);
         }
     }
 }
 
-// Stays put while the list scrolls under it.
-.vocab__search {
-    position: sticky;
-    z-index: layer('raised');
-    inset-block-start: calc(var(--vocab-gutter) * -1);
-    display: flex;
-    gap: space(3);
-    align-items: center;
-    margin-block: calc(var(--vocab-gutter) * -1) space(3);
-    padding-block: var(--vocab-gutter) space(3);
-    background-color: var(--color-surface-raised);
+// On a wide screen the list, its bar and its footer share one centred column
+// rather than holding two words a whole monitor apart.
+.vocab,
+.modal--full .pick {
+    inline-size: 100%;
+    max-inline-size: rem(880);
+    margin-inline: auto;
 }
 
-.vocab__search .input {
+// The columns are named once, so the heads and every line agree on them.
+.vocab {
+    --vocab-columns: minmax(0, 1fr) minmax(0, 1fr) #{rem(10)};
+}
+
+.vocab--pick {
+    --vocab-columns: #{rem(20)} minmax(0, 1fr) minmax(0, 1fr) #{rem(10)};
+}
+
+// Search and filters stay put while the list scrolls under them. Opaque, in
+// the dialog's own fill, so the words pass behind it rather than through it.
+.vocab__bar {
+    position: sticky;
+    z-index: layer('raised');
+    inset-block-start: 0;
+    display: grid;
+    // A bare `auto` track would grow to the chips' unwrapped width and push
+    // the search box off a phone's screen.
+    grid-template-columns: minmax(0, 1fr);
+    gap: space(2);
+    padding-block: space(3) space(2);
+    background-color: var(--color-surface-raised);
+    border-block-end: 1px solid var(--color-border);
+}
+
+.vocab__search {
+    display: flex;
+    gap: space(2);
+    align-items: center;
+}
+
+.vocab__field {
+    position: relative;
     flex: 1;
     min-width: 0;
 }
 
+.vocab__field-icon {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: space(3);
+    color: var(--color-text-subtle);
+    pointer-events: none;
+    translate: 0 -50%;
+}
+
+.vocab__input {
+    min-block-size: rem(44);
+    padding-inline-start: space(10);
+    border-radius: var(--radius-full);
+
+    // Under 16px, iOS zooms the whole page in on focus and leaves it there.
+    @media (hover: none), (pointer: coarse) {
+        font-size: var(--text-base);
+    }
+}
+
 .vocab__count {
+    flex: none;
     margin: 0;
+    padding: space(1) space(2);
     font-size: var(--text-xs);
     font-variant-numeric: tabular-nums;
     color: var(--color-text-muted);
     white-space: nowrap;
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-full);
+
+    &:empty {
+        display: none;
+    }
+}
+
+.vocab__filters {
+    display: flex;
+    gap: space(2);
+    align-items: center;
+}
+
+// One row that scrolls sideways on a phone rather than wrapping into two. It
+// runs out to the screen's near edge and fades out before « Tout cocher », so
+// a chip cut short reads as « there is more » rather than as a mistake.
+.vocab__chips {
+    display: flex;
+    flex: 1;
+    gap: space(2);
+    min-width: 0;
+    margin-inline-start: calc(var(--vocab-gutter) * -1);
+    padding-inline: var(--vocab-gutter) space(6);
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    mask-image: linear-gradient(to right, #000 calc(100% - #{space(6)}), transparent);
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    @include up('sm') {
+        margin-inline-start: 0;
+        padding-inline: 0;
+        mask-image: none;
+    }
+}
+
+.vocab__chip {
+    @include interactive(1.03, 0.95);
+    @include focus-glow-visible;
+
+    display: inline-flex;
+    flex: none;
+    gap: rem(6);
+    align-items: center;
+    min-block-size: rem(32);
+    padding-inline: space(3);
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    cursor: pointer;
+    background-color: transparent;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+
+    @include tap-target(false, rem(36));
+
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            color: var(--color-text);
+        }
+    }
+
+    &[aria-pressed='true'] {
+        color: var(--color-accent-contrast);
+        background-color: var(--color-accent);
+        border-color: var(--color-accent);
+
+        .vocab__chip-count {
+            color: inherit;
+            opacity: 0.75;
+        }
+    }
+}
+
+.vocab__chip-count {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-subtle);
+}
+
+// The mark a word carries: the deck's two decisions, and nothing for a word
+// nobody has judged yet.
+.vocab__dot {
+    flex: none;
+    inline-size: rem(8);
+    block-size: rem(8);
+    border: 1.5px solid currentcolor;
+    border-radius: var(--radius-full);
+    opacity: 0.7;
+}
+
+.vocab__dot--known,
+.vocab__dot--review {
+    border: 0;
+    opacity: 1;
+}
+
+.vocab__dot--known {
+    background-color: var(--color-success);
+}
+
+.vocab__dot--review {
+    background-color: var(--color-warning);
+}
+
+.vocab__all {
+    flex: none;
+    min-block-size: rem(32);
+    padding-inline: space(2);
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-accent);
+    white-space: nowrap;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-md);
+
+    @include focus-visible;
+    @include tap-target(false, rem(36));
+
+    &:disabled {
+        color: var(--color-text-subtle);
+        cursor: default;
+    }
+}
+
+// Only where the two words sit side by side.
+.vocab__head {
+    display: none;
+
+    @include up('sm') {
+        display: grid;
+        grid-template-columns: var(--vocab-columns);
+        gap: space(4);
+        padding: space(3) space(3) space(2);
+        font-size: var(--text-xs);
+        font-weight: 600;
+        letter-spacing: var(--tracking-wide);
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+    }
+}
+
+.vocab__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+// Lines stay cheap on purpose: up to 500 of them filter on every keystroke,
+// so a line gets a background swap and nothing else — no shadow, no lift, no
+// transition on its size.
+.vocab__row {
+    border-block-end: 1px solid var(--color-border);
+}
+
+// On a phone the two words stack, French over the other language, so a long
+// verb form wraps inside its own line instead of squeezing a column.
+.vocab__item {
+    display: grid;
+    grid-template-areas:
+        'native status'
+        'target status';
+    grid-template-columns: minmax(0, 1fr) rem(10);
+    gap: rem(2) space(3);
+    align-items: center;
+    min-block-size: rem(56);
+    padding: space(2) space(3);
+    border-radius: var(--radius-md);
+    transition: background-color $duration-fast $ease-out;
+
+    .vocab--pick & {
+        grid-template-areas:
+            'tick native status'
+            'tick target status';
+        grid-template-columns: rem(20) minmax(0, 1fr) rem(10);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+
+    @include up('sm') {
+        grid-template-areas: 'native target status';
+        grid-template-columns: var(--vocab-columns);
+        column-gap: space(4);
+        min-block-size: rem(44);
+
+        .vocab--pick & {
+            grid-template-areas: 'tick native target status';
+            grid-template-columns: var(--vocab-columns);
+        }
+    }
+
+    // Gated: on a phone `:hover` latches after a tap and would sit on the last
+    // word touched.
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            background-color: var(--color-surface-muted);
+        }
+    }
+}
+
+.vocab__row.is-picked .vocab__item {
+    background-color: var(--color-accent-soft);
+}
+
+.vocab__tick {
+    grid-area: tick;
+    inline-size: rem(20);
+    block-size: rem(20);
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--color-accent);
+
+    @include focus-visible;
+}
+
+.vocab__native {
+    grid-area: native;
+    font-weight: 500;
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+}
+
+.vocab__target {
+    grid-area: target;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+}
+
+@include up('sm') {
+    .vocab__native,
+    .vocab__target {
+        font-size: var(--text-sm);
+    }
+
+    .vocab__target {
+        color: var(--color-text);
+    }
+}
+
+.vocab__status {
+    grid-area: status;
+    justify-self: center;
+    inline-size: rem(8);
+    block-size: rem(8);
+    border-radius: var(--radius-full);
+
+    .vocab__row[data-status='known'] & {
+        background-color: var(--color-success);
+    }
+
+    .vocab__row[data-status='review'] & {
+        background-color: var(--color-warning);
+    }
 }
 
 .vocab__empty {
-    padding-block: space(6);
+    display: grid;
+    gap: space(3);
+    justify-items: center;
+    padding-block: space(12);
     color: var(--color-text-muted);
     text-align: center;
+
+    p {
+        margin: 0;
+    }
 }
 
 // Choosing words -----------------------------------------------------------------
 
-// The tick column takes exactly what a tick needs; the two word columns keep
-// the rest. The whole line is clickable, so the cursor says so.
-.vocab__pick {
-    width: rem(28);
-    padding-inline-end: 0;
-}
-
-.table--compact tbody tr:has(.vocab__pick) {
-    cursor: pointer;
-}
-
-// The bar under the list: what is ticked, and what becomes of it. It wraps to
-// two rows on a phone rather than squeezing the name box out of reach.
+// The bar under the list: a line of help until a word is ticked, then the
+// count over the controls that act on it.
 .pick {
-    display: flex;
+    display: grid;
     flex: 1;
-    flex-wrap: wrap;
     gap: space(3);
+    min-width: 0;
+
+    @include up('md') {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.pick__summary {
+    display: flex;
+    gap: space(2);
     align-items: center;
     min-width: 0;
+
+    @include up('md') {
+        flex: 1;
+    }
 }
 
-// The count stays on the near end and pushes everything else to the far one,
-// whether or not « Tout décocher » is showing.
 .pick__count {
+    flex: 1;
+    min-width: 0;
     margin: 0;
-    margin-inline-end: auto;
     font-size: var(--text-sm);
     font-variant-numeric: tabular-nums;
     color: var(--color-text-muted);
-    white-space: nowrap;
+
+    .pick.is-picking & {
+        font-weight: 600;
+        color: var(--color-text);
+    }
 }
 
-.pick__target,
+.pick__clear {
+    flex: none;
+}
+
+// A phone gets a full row for the list to add to, then the name and the
+// button side by side; adding to an existing list needs no name, so the list
+// and the button share the row instead.
+.pick__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space(2);
+    align-items: center;
+
+    @include state-enter(rise-in);
+
+    @include up('md') {
+        flex-wrap: nowrap;
+    }
+}
+
+.pick__target {
+    flex: 1 1 100%;
+    min-width: 0;
+
+    .pick__controls.is-adding & {
+        flex-basis: 0;
+    }
+
+    @include up('md') {
+        flex: 0 1 rem(200);
+    }
+}
+
 .pick__name {
-    flex: 0 1 rem(180);
-    min-width: rem(140);
+    flex: 1 1 0;
+    min-width: 0;
+
+    @media (hover: none), (pointer: coarse) {
+        font-size: var(--text-base);
+    }
+
+    @include up('md') {
+        flex: 0 1 rem(220);
+    }
+}
+
+.pick__submit {
+    flex: none;
 }
 
 .pick__name[hidden] {

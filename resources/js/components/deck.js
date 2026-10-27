@@ -48,6 +48,11 @@ function play(config) {
     const knownSet = new Set();
     const reviewSet = new Set();
 
+    const statusOf = (index) => (knownSet.has(index) ? 'known' : (reviewSet.has(index) ? 'review' : null));
+
+    // The word list, once it is built; it carries the same marks as the deck.
+    let wordList = null;
+
     // Restore the session: the marks come from the database, by card id.
     deck.forEach((card, i) => {
         if (config.states[card.id] === 'known') knownSet.add(i);
@@ -153,7 +158,7 @@ function play(config) {
     function renderMark(index) {
         frontMark.replaceChildren();
 
-        const kind = knownSet.has(index) ? 'known' : (reviewSet.has(index) ? 'review' : null);
+        const kind = statusOf(index);
 
         if (! kind) return;
 
@@ -449,6 +454,7 @@ function play(config) {
 
         persist(index, kind);
         renderCounts();
+        wordList?.update(index);
         celebrate(kind);
 
         if (filterState === 'all') {
@@ -467,6 +473,7 @@ function play(config) {
         knownSet.clear();
         reviewSet.clear();
         renderCounts();
+        wordList?.updateAll();
         setFilter('all');
         note('');
     });
@@ -503,24 +510,29 @@ function play(config) {
 
     render();
     renderCounts();
-    vocabulary(deck);
+    wordList = vocabulary(deck, statusOf);
 }
 
 /**
- * The whole list, flat and alphabetical by the French side. When the page
- * carries a selection form, every line also gets a tick: that is how a user
- * cuts a deck of their own out of the list.
+ * The whole list, flat and alphabetical by the French side, each line marked
+ * with what the user already said about it. When the page carries a selection
+ * form, every line is also a tick: that is how a user cuts a deck of their own
+ * out of the list.
+ *
+ * Returns a handle the game uses to keep the marks in step, or null when the
+ * page has no list.
  */
-function vocabulary(deck) {
-    const template = el('vocabRows');
+function vocabulary(deck, statusOf) {
+    const host = el('vocabList');
 
-    if (! template) {
-        return;
+    if (! host) {
+        return null;
     }
 
-    const host = template.parentElement;
     const form = document.querySelector('[data-pick]');
     const rows = [];
+    const rowOf = new Map();
+    const STATUS = { known: 'Connu', review: 'À revoir' };
 
     // The search ignores accents and ligatures: « etre » finds « l'être »,
     // « madchen » finds « das Mädchen », « soeur » finds « la sœur » and
@@ -532,78 +544,168 @@ function vocabulary(deck) {
         .toLowerCase()
         .replace(/[œæß]/g, (char) => LIGATURES[char])
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '');
+        .replace(/[̀-ͯ]/g, '');
 
-    deck.slice().sort((a, b) => a.translation.localeCompare(b.translation, 'fr')).forEach((card) => {
-        const row = document.createElement('tr');
+    const span = (className, text) => {
+        const node = document.createElement('span');
+        node.className = className;
+        node.textContent = text;
 
-        if (form) {
-            // The tick belongs to the form in the footer, not to the table it
-            // sits in: `form=` is what lets the list scroll under a bar that
-            // stays put.
-            const cell = document.createElement('td');
-            cell.className = 'vocab__pick';
+        return node;
+    };
 
-            const box = document.createElement('input');
-            box.type = 'checkbox';
-            box.className = 'choice__control';
-            box.name = 'cards[]';
-            box.value = card.id;
-            box.setAttribute('form', form.id);
-            box.setAttribute('aria-label', 'Choisir « ' + card.translation + ' »');
+    // Only writes when the mark actually changed: a reset walks every line.
+    function paint(row, status) {
+        const value = status ?? '';
 
-            cell.append(box);
-            row.append(cell);
-        }
+        if (row.dataset.status === value) return;
 
-        const translation = document.createElement('td');
-        translation.textContent = card.translation;
-        const term = document.createElement('td');
-        term.textContent = card.term;
-        row.append(translation, term);
-        row.dataset.search = fold(card.translation + ' ' + card.term);
-        host.append(row);
-        rows.push(row);
-    });
+        row.dataset.status = value;
+        row.querySelector('.vocab__status > .visually-hidden').textContent = status ? STATUS[status] : '';
+    }
 
-    template.remove();
+    // Built off-document and attached once: 500 lines, one layout.
+    const fragment = document.createDocumentFragment();
+
+    deck
+        .map((card, index) => ({ card, index }))
+        .sort((a, b) => a.card.translation.localeCompare(b.card.translation, 'fr'))
+        .forEach(({ card, index }) => {
+            const row = document.createElement('li');
+            row.className = 'vocab__row';
+
+            // A `<label>` around the tick makes the whole line the target, and
+            // gives the tick its name — the two words — for free.
+            const item = document.createElement(form ? 'label' : 'div');
+            item.className = 'vocab__item';
+
+            if (form) {
+                // The tick belongs to the form in the footer, not to the list
+                // it sits in: `form=` is what lets the list scroll under a bar
+                // that stays put.
+                const box = document.createElement('input');
+                box.type = 'checkbox';
+                box.className = 'vocab__tick';
+                box.name = 'cards[]';
+                box.value = card.id;
+                box.setAttribute('form', form.id);
+                item.append(box);
+            }
+
+            const status = span('vocab__status', '');
+            status.append(span('visually-hidden', ''));
+
+            item.append(
+                span('vocab__native', card.translation),
+                span('vocab__target', card.term),
+                status,
+            );
+
+            row.append(item);
+            row.dataset.search = fold(card.translation + ' ' + card.term);
+            paint(row, statusOf(index));
+
+            fragment.append(row);
+            rows.push(row);
+            rowOf.set(index, row);
+        });
+
+    host.append(fragment);
 
     const search = el('vocabSearch');
     const count = el('vocabCount');
     const empty = el('vocabEmpty');
+    const echo = el('vocabQuery');
+    const chips = document.querySelectorAll('[data-vocab-filter]');
+    const tallies = document.querySelectorAll('[data-vocab-tally]');
+    let show = 'all';
+    let picker = null;
+
+    function tally() {
+        const totals = { known: 0, review: 0, new: 0 };
+
+        rows.forEach((row) => { totals[row.dataset.status || 'new']++; });
+        tallies.forEach((node) => { node.textContent = totals[node.dataset.vocabTally]; });
+    }
 
     function filter() {
-        const query = fold(search.value.trim());
+        const raw = search.value.trim();
+        const query = fold(raw);
         let shown = 0;
 
         rows.forEach((row) => {
-            const hit = query === '' || row.dataset.search.includes(query);
-            row.hidden = ! hit;
+            const hit = (show === 'all' || (row.dataset.status || 'new') === show)
+                && (query === '' || row.dataset.search.includes(query));
 
+            if (row.hidden === hit) row.hidden = ! hit;
             if (hit) shown++;
         });
 
-        count.textContent = shown + ' / ' + rows.length;
+        // Says nothing while the whole list is showing.
+        count.textContent = shown === rows.length ? '' : shown + ' / ' + rows.length;
+        echo.textContent = raw === '' ? '' : ' à « ' + raw + ' »';
         empty.hidden = shown !== 0;
+        picker?.refresh();
     }
+
+    function setShow(value) {
+        show = value;
+        chips.forEach((chip) => chip.setAttribute('aria-pressed', chip.dataset.vocabFilter === value ? 'true' : 'false'));
+        filter();
+    }
+
+    chips.forEach((chip) => {
+        chip.onclick = () => setShow(chip.dataset.vocabFilter);
+    });
 
     search.addEventListener('input', filter);
-    filter();
+
+    // « Rechercher » on a phone keyboard has nothing to submit: it puts the
+    // keyboard away so the results can be read.
+    search.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') search.blur();
+    });
+
+    el('vocabReset').onclick = () => {
+        search.value = '';
+        setShow('all');
+    };
 
     if (form) {
-        picking(form, host);
+        picker = picking(form, host);
     }
+
+    tally();
+    filter();
+
+    return {
+        update(index) {
+            paint(rowOf.get(index), statusOf(index));
+            tally();
+            filter();
+        },
+        updateAll() {
+            rowOf.forEach((row, index) => paint(row, statusOf(index)));
+            tally();
+            filter();
+        },
+    };
 }
 
 /**
  * The bar under the list: how many words are ticked, and what happens to them.
+ * Until something is ticked it is a single line saying how it works.
  *
  * A search only hides lines, so a word ticked in one search is still ticked
  * after the next — the count is the truth, and it is read aloud as it changes.
  */
 function picking(form, host) {
+    const HINT = 'Cochez des mots pour en faire une sélection.';
+
     const count = el('pickCount');
     const clear = form.querySelector('[data-pick-clear]');
+    const all = document.querySelector('[data-pick-all]');
+    const controls = form.querySelector('[data-pick-controls]');
     const target = form.querySelector('[data-pick-target]');
     const name = form.querySelector('[data-pick-name]');
     const submit = form.querySelector('[data-pick-submit]');
@@ -619,35 +721,44 @@ function picking(form, host) {
         const adding = target !== null && target.value !== '';
 
         count.textContent = chosen === 0
-            ? 'Aucun mot choisi'
+            ? HINT
             : chosen + (chosen === 1 ? ' mot choisi' : ' mots choisis');
 
+        form.classList.toggle('is-picking', chosen > 0);
+        controls.classList.toggle('is-adding', adding);
+        controls.hidden = chosen === 0;
         clear.hidden = chosen === 0;
+        all.disabled = host.querySelector('.vocab__row:not([hidden]) input:not(:checked)') === null;
         name.hidden = adding;
         name.disabled = adding;
         label.textContent = adding ? 'Ajouter à la sélection' : 'Créer la sélection';
         submit.disabled = chosen === 0 || (! adding && name.value.trim().length < 2);
     }
 
+    // The ticked line is lit by a class rather than `:has(:checked)`, which
+    // would send the browser back over every line on each tick.
     host.addEventListener('change', (event) => {
-        if (event.target.matches('input[type="checkbox"]')) refresh();
-    });
+        if (! event.target.matches('input[type="checkbox"]')) return;
 
-    // The whole line is the tick: a word list read on a phone is no place to
-    // aim for an 18px box.
-    host.addEventListener('click', (event) => {
-        if (event.target.closest('input')) return;
-
-        const box = event.target.closest('tr')?.querySelector('input[type="checkbox"]');
-
-        if (! box) return;
-
-        box.checked = ! box.checked;
+        event.target.closest('.vocab__row').classList.toggle('is-picked', event.target.checked);
         refresh();
     });
 
     clear.onclick = () => {
-        boxes(':checked').forEach((box) => { box.checked = false; });
+        boxes(':checked').forEach((box) => {
+            box.checked = false;
+            box.closest('.vocab__row').classList.remove('is-picked');
+        });
+        refresh();
+    };
+
+    // Ticks what the search and the filter leave showing — « À revoir », then
+    // « Tout cocher », is a selection of the hard words in two taps.
+    all.onclick = () => {
+        host.querySelectorAll('.vocab__row:not([hidden])').forEach((row) => {
+            row.querySelector('input').checked = true;
+            row.classList.add('is-picked');
+        });
         refresh();
     };
 
@@ -655,4 +766,6 @@ function picking(form, host) {
     target?.addEventListener('change', refresh);
 
     refresh();
+
+    return { refresh };
 }

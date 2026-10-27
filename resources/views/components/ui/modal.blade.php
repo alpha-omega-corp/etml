@@ -46,7 +46,7 @@
             @endisset
 
             <button type="button" class="modal__close" data-modal-close="dismiss">
-                <span class="visually-hidden">Close</span>
+                <span class="visually-hidden">Fermer</span>
                 <x-ui.icon name="x" />
             </button>
         </div>

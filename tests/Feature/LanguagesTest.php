@@ -83,8 +83,8 @@ class LanguagesTest extends TestCase
 
         $html = $this->get('/')->assertOk()->getContent();
 
-        // 146 + 179 + 61 + 61 seeded cards, one of them known.
-        $this->assertStringContainsString('>447<', $html);
+        // 146 + 179 + 126 + 61 + 61 seeded cards, one of them known.
+        $this->assertStringContainsString('>573<', $html);
         $this->assertStringContainsString('>1<', $html);
         $this->assertStringContainsString('cartes', $html);
         $this->assertStringContainsString('connues', $html);

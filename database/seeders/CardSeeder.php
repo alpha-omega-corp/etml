@@ -25,6 +25,7 @@ class CardSeeder extends Seeder
     private const DECKS = [
         ['language' => 'allemand', 'kind' => UnitKind::Vocabulary, 'position' => 1, 'name' => 'Voc 1', 'file' => 'deck.json'],
         ['language' => 'allemand', 'kind' => UnitKind::Vocabulary, 'position' => 2, 'name' => 'Voc 2', 'file' => 'voc-2.json'],
+        ['language' => 'allemand', 'kind' => UnitKind::Vocabulary, 'position' => 3, 'name' => 'Voc 3', 'file' => 'voc-3.json'],
         ['language' => 'allemand', 'kind' => UnitKind::Verbs, 'position' => 1, 'name' => 'Verben 1', 'file' => 'verben-1.json'],
         ['language' => 'allemand', 'kind' => UnitKind::Verbs, 'position' => 2, 'name' => 'Verben 2', 'file' => 'verben-2.json'],
         ['language' => 'anglais', 'kind' => UnitKind::Vocabulary, 'position' => 1, 'name' => 'Voc Unit 1', 'file' => 'voc-unit-1-en.json'],

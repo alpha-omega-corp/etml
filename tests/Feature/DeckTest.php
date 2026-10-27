@@ -58,7 +58,7 @@ class DeckTest extends TestCase
 
         $this->assertSame('Voc 1', $unit->name);
         $this->assertSame(146, $cards->count());
-        $this->assertSame(570, Card::count());
+        $this->assertSame(696, Card::count());
 
         $first = $cards->first();
         $this->assertSame('der Mensch, en, en', $first->term);
@@ -194,6 +194,29 @@ class DeckTest extends TestCase
             ->assertSee('modal--full', false)
             ->assertSee('id="vocabSearch"', false)
             ->assertSee('data-modal-close', false);
+    }
+
+    public function test_the_vocabulary_list_filters_by_the_marks_the_deck_gives(): void
+    {
+        $this->get($this->deckUrl())
+            ->assertOk()
+            ->assertSee('id="vocabList"', false)
+            ->assertSee('data-vocab-filter="all"', false)
+            ->assertSee('data-vocab-filter="review"', false)
+            ->assertSee('data-vocab-filter="known"', false)
+            ->assertSee('data-vocab-filter="new"', false)
+            // Says which chapter it lists, and how many words.
+            ->assertSee('Voc 1 · 146 mots');
+    }
+
+    public function test_the_verb_table_is_not_called_a_vocabulary(): void
+    {
+        $verbs = $this->german()->units()->where('kind', UnitKind::Verbs)->firstOrFail();
+
+        $this->get($this->deckUrl($verbs))
+            ->assertOk()
+            ->assertSee('Tout le tableau')
+            ->assertDontSee('Tout le vocabulaire');
     }
 
     public function test_the_search_does_not_grab_focus_when_the_list_opens(): void
