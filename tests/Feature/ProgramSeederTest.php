@@ -66,8 +66,8 @@ class ProgramSeederTest extends TestCase
 
         $this->assertSame(['Verben 1', 'Verben 2'], $pages->all());
 
-        // Ten chapters, numbered in the order their weeks fall, and the three
-        // shipped word lists sit in the first three rather than beside them.
+        // Ten chapters, numbered in the order their weeks fall, and the four
+        // shipped word lists sit in the first four rather than beside them.
         $this->assertSame(
             ['Voc 1', 'Voc 2', 'Voc 3', 'Voc 4', 'Voc 5', 'Voc 6', 'Voc 7', 'Voc 8', 'Voc 9', 'Voc 10'],
             $chapters->all(),
@@ -77,6 +77,7 @@ class ProgramSeederTest extends TestCase
         $this->assertSame(146, $units['Voc 1']->cards_count);
         $this->assertSame(179, $units['Voc 2']->cards_count);
         $this->assertSame(126, $units['Voc 3']->cards_count);
+        $this->assertSame(119, $units['Voc 4']->cards_count);
 
         $pages = $this->german()->unitsOfKind(UnitKind::Verbs)->keyBy('name');
         $this->assertSame(61, $pages['Verben 1']->cards_count);
@@ -169,7 +170,7 @@ class ProgramSeederTest extends TestCase
 
     public function test_a_chapter_the_programme_named_opens_ready_to_be_filled(): void
     {
-        $unit = Unit::where('name', 'Voc 4')->firstOrFail();
+        $unit = Unit::where('name', 'Voc 5')->firstOrFail();
 
         $this->get(route('deck.show', [$this->german(), 'vocabulaire', $unit], absolute: false))
             ->assertOk()

@@ -58,7 +58,7 @@ class DeckTest extends TestCase
 
         $this->assertSame('Voc 1', $unit->name);
         $this->assertSame(146, $cards->count());
-        $this->assertSame(696, Card::count());
+        $this->assertSame(815, Card::count());
 
         $first = $cards->first();
         $this->assertSame('der Mensch, en, en', $first->term);

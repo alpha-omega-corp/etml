@@ -85,7 +85,7 @@ class SelectionsTest extends TestCase
         $this->make();
 
         // The selection points at the chapter's cards: not one row was written.
-        $this->assertSame(696, Card::count());
+        $this->assertSame(815, Card::count());
         $this->assertSame(146, $this->chapter()->cards()->count());
     }
 
@@ -265,11 +265,11 @@ class SelectionsTest extends TestCase
     {
         // The picker counts the cards a language wrote, so the same word met
         // twice is still one card.
-        $this->get('/')->assertOk()->assertSee('573');
+        $this->get('/')->assertOk()->assertSee('692');
 
         $this->make();
 
-        $this->get('/')->assertOk()->assertSee('573');
+        $this->get('/')->assertOk()->assertSee('692');
     }
 
     // --- renaming and deleting -------------------------------------------------
@@ -307,7 +307,7 @@ class SelectionsTest extends TestCase
 
         $this->assertNull(Unit::find($selection->id));
         $this->assertSame(146, $this->chapter()->cards()->count());
-        $this->assertSame(696, Card::count());
+        $this->assertSame(815, Card::count());
     }
 
     public function test_nobody_else_can_delete_it(): void
