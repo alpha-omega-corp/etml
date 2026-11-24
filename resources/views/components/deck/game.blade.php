@@ -38,6 +38,12 @@
 
     <div class="deck__filters btn-group" role="group" aria-label="Filtrer les cartes">
         <button type="button" class="btn btn--sm" data-filter="all" aria-pressed="true">Tous</button>
+        {{-- « Apprendre » plays every word not yet known. A word never seen
+             must first be introduced — « Découvrir » below — before it can
+             be graded. --}}
+        <button type="button" class="btn btn--sm" data-filter="learn" aria-pressed="false">
+            Apprendre <span class="deck__filter-count" id="learnCount">{{ count($cards) - count(array_keys($states, \App\Models\CardState::STATUS_KNOWN, true)) }}</span>
+        </button>
         <button type="button" class="btn btn--sm" data-filter="known" aria-pressed="false">
             Connus <span class="deck__filter-count" id="knownCount">0</span>
         </button>
@@ -85,6 +91,11 @@
         </button>
 
         <div class="deck__decide">
+            <button type="button" class="btn btn--decision btn--intro" id="btnIntro" hidden>
+                <x-ui.icon name="eye" />
+                <span class="btn__label">Découvrir</span>
+            </button>
+
             <button type="button" class="btn btn--decision btn--review" id="btnReview">
                 <x-ui.icon name="clock" />
                 <span class="btn__label">À revoir</span>

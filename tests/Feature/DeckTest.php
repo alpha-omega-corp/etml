@@ -366,6 +366,21 @@ class DeckTest extends TestCase
         $this->assertSame(0, CardState::count());
     }
 
+    public function test_learning_offers_an_introduction_before_the_decisions(): void
+    {
+        // « Apprendre » counts every word not yet known; « Découvrir » ships
+        // hidden and `deck.js` shows it, in place of the two decisions, for a
+        // word that was never seen.
+        $this->postJson("/cards/{$this->firstCard()->id}/status", ['status' => 'known'])->assertOk();
+
+        $this->get($this->deckUrl())
+            ->assertOk()
+            ->assertSee('data-filter="learn" aria-pressed="false"', false)
+            ->assertSeeInOrder(['Apprendre', 'id="learnCount">'.($this->unit()->cards()->count() - 1).'<'], false)
+            ->assertSee('id="btnIntro" hidden', false)
+            ->assertSee('Découvrir');
+    }
+
     public function test_an_empty_filter_shows_a_glyph_rather_than_the_words(): void
     {
         // Nothing is marked yet, so « Connus » and « À revoir » are both empty.

@@ -15,6 +15,11 @@
  *
  * `term` is the word in the language being learnt, `translation` the French
  * side. Swap those two strings and the same module teaches any language.
+ *
+ * « Apprendre » plays every word not yet known, and a word that was never seen
+ * cannot be graded there before it has been introduced: « Découvrir » turns
+ * the card over and files the word under « À revoir », and only then do
+ * « Je sais » and « À revoir » come back.
  */
 
 const FX_BITS = 18;
@@ -50,6 +55,9 @@ function play(config) {
 
     const statusOf = (index) => (knownSet.has(index) ? 'known' : (reviewSet.has(index) ? 'review' : null));
 
+    // In « Apprendre », a word with no mark has not been introduced yet.
+    const needsIntro = (index) => filterState === 'learn' && statusOf(index) === null;
+
     // The word list, once it is built; it carries the same marks as the deck.
     let wordList = null;
 
@@ -71,6 +79,10 @@ function play(config) {
     const progressFill = el('progressFill');
     const knownCount = el('knownCount');
     const reviewCount = el('reviewCount');
+    const learnCount = el('learnCount');
+    const btnKnown = el('btnKnown');
+    const btnReview = el('btnReview');
+    const btnIntro = el('btnIntro');
     const syncNote = el('syncNote');
     const filterButtons = document.querySelectorAll('[data-filter]');
     const directionButtons = document.querySelectorAll('[data-direction]');
@@ -121,6 +133,7 @@ function play(config) {
     function listForFilter(filter) {
         if (filter === 'known') return Array.from(knownSet);
         if (filter === 'review') return Array.from(reviewSet);
+        if (filter === 'learn') return deck.map((_, i) => i).filter((i) => ! knownSet.has(i));
 
         return deck.map((_, i) => i);
     }
@@ -153,6 +166,16 @@ function play(config) {
     function renderCounts() {
         knownCount.textContent = knownSet.size;
         reviewCount.textContent = reviewSet.size;
+        learnCount.textContent = deck.length - knownSet.size;
+    }
+
+    // A word waiting for its introduction offers « Découvrir » alone.
+    function renderDecisions(index) {
+        const intro = index !== undefined && needsIntro(index);
+
+        btnIntro.hidden = ! intro;
+        btnKnown.hidden = intro;
+        btnReview.hidden = intro;
     }
 
     function renderMark(index) {
@@ -160,7 +183,16 @@ function play(config) {
 
         const kind = statusOf(index);
 
-        if (! kind) return;
+        if (! kind) {
+            if (needsIntro(index)) {
+                const badge = document.createElement('span');
+                badge.className = 'badge badge--info';
+                badge.textContent = 'Nouveau';
+                frontMark.append(badge);
+            }
+
+            return;
+        }
 
         const badge = document.createElement('span');
         badge.className = 'badge badge--' + (kind === 'known' ? 'success' : 'warning');
@@ -197,6 +229,7 @@ function play(config) {
             example.textContent = '';
             posLabel.textContent = '0 / 0';
             progressFill.style.width = '0%';
+            renderDecisions();
 
             return;
         }
@@ -220,6 +253,7 @@ function play(config) {
 
         example.textContent = card.ex || '';
         renderMark(index);
+        renderDecisions(index);
         posLabel.textContent = (pos + 1) + ' / ' + order.length;
         progressFill.style.width = (pos / (order.length - 1 || 1) * 100) + '%';
     }
@@ -342,7 +376,7 @@ function play(config) {
     // leaves nothing behind, and a repeated press simply cancels the running
     // animations instead of stacking them.
 
-    const decisionButtons = { known: el('btnKnown'), review: el('btnReview') };
+    const decisionButtons = { known: btnKnown, review: btnReview };
     const bursts = {};
     const runningAnims = { known: [], review: [] };
     const litTimers = {};
@@ -449,6 +483,8 @@ function play(config) {
 
         const index = order[pos];
 
+        if (needsIntro(index)) return;
+
         (kind === 'known' ? knownSet : reviewSet).add(index);
         (kind === 'known' ? reviewSet : knownSet).delete(index);
 
@@ -457,7 +493,9 @@ function play(config) {
         wordList?.update(index);
         celebrate(kind);
 
-        if (filterState === 'all') {
+        // A word still in the list being played just moves on: always so in
+        // « Tous », and in « Apprendre » for a word left to review.
+        if (filterState === 'all' || (filterState === 'learn' && kind === 'review')) {
             renderMark(index);
             next();
         } else {
@@ -465,8 +503,32 @@ function play(config) {
         }
     }
 
-    el('btnKnown').onclick = () => mark('known');
-    el('btnReview').onclick = () => mark('review');
+    btnKnown.onclick = () => mark('known');
+    btnReview.onclick = () => mark('review');
+
+    // The introduction: the card turns over to show the word, which goes
+    // under « À revoir ». The card stays put so it can be read; the two
+    // decisions take the button's place.
+    function introduce() {
+        if (order.length === 0) return;
+
+        const index = order[pos];
+
+        if (! needsIntro(index)) return;
+
+        reviewSet.add(index);
+        persist(index, 'review');
+        renderCounts();
+        wordList?.update(index);
+
+        if (! flipped) flip();
+
+        renderMark(index);
+        renderDecisions(index);
+        btnKnown.focus();
+    }
+
+    btnIntro.onclick = introduce;
 
     // The header's « effacer mes listes » has already spoken to the server.
     document.addEventListener('cards:reset', () => {

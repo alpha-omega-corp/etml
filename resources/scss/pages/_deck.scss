@@ -716,7 +716,9 @@ body.is-nav-open {
 // Filters: one segmented control, counts carried as numbers, not sentences.
 .deck__filters {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    // Sized by their labels: « Apprendre » and its count need more room
+    // than « Tous » on a phone.
+    grid-template-columns: repeat(4, auto);
 }
 
 // Touch targets: the segmented control stays comfortably tappable even though
@@ -1072,17 +1074,21 @@ body.is-nav-open {
     // `lit` is the bright hue — particles, ring, halo, flash.
     --lit-known: #34d399;
     --lit-review: #fb923c;
+    --lit-intro: #60a5fa;
 
     // `solid` is the resting fill. Deeper than `lit` because the label is white
     // and white on the bright hue lands near 2:1; these clear 4.7:1.
     --solid-known: #0b8457;
     --solid-review: #b8510c;
+    --solid-intro: #1d5fd8;
 
     @include dark {
         --lit-known: #6ee7b7;
         --lit-review: #fdba74;
+        --lit-intro: #93c5fd;
         --solid-known: #0d9463;
         --solid-review: #c95c0d;
+        --solid-intro: #2563eb;
     }
 }
 
@@ -1100,6 +1106,12 @@ body.is-nav-open {
 .btn--review {
     --btn-lit: var(--lit-review);
     --btn-solid: var(--solid-review);
+}
+
+// « Découvrir » stands in for both decisions while a new word is introduced.
+.btn--intro {
+    --btn-lit: var(--lit-intro);
+    --btn-solid: var(--solid-intro);
 }
 
 // The two decisions step outside the template's button vocabulary on purpose:
